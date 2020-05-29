@@ -1,7 +1,7 @@
 package main
 
 /*
-#include <erl_nif.h>
+#include "erl_nif.h"
 #include <string.h>
 
 static void update_binary(ErlNifBinary* bin, void* str, size_t size) {

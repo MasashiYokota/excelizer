@@ -1,7 +1,7 @@
 // #include "libexcelizir.h"
 #include <stdio.h>
 #include "erl_nif.h"
-#include "libexcelizir.h"
+#include "libgo_excelizir.h"
 
 // erlang string と c string変換 https://stackoverflow.com/questions/12928943/how-do-you-return-a-string-from-an-erlang-c-node
 
