@@ -2,10 +2,16 @@ package main
 
 /*
 #include <erl_nif.h>
+#include <string.h>
+
+static void update_binary(ErlNifBinary* bin, void* str, size_t size) {
+	memcpy(bin->data, str, size);
+}
+
 */
 import "C"
 import (
-	"reflect"
+	"fmt"
 	"unsafe"
 
 	"github.com/360EntSecGroup-Skylar/excelize"
@@ -25,8 +31,8 @@ func ReadSheet(env *C.ErlNifEnv, enifFilename, enifSheetName C.ErlNifBinary) C.E
 	var output []C.ERL_NIF_TERM
 	file, err := excelize.OpenFile(filename)
 	if err != nil {
-		println(err.Error())
-		enif_status := createEnifBinary(env, "error")
+		fmt.Println(err.Error())
+		enif_status := createEnifAtom(env, "error")
 		message := createEnifBinary(env, "load error")
 		return C.enif_make_tuple2(env, enif_status, message)
 	}
@@ -40,7 +46,7 @@ func ReadSheet(env *C.ErlNifEnv, enifFilename, enifSheetName C.ErlNifBinary) C.E
 		erlRow := C.enif_make_list_from_array(env, (*C.ERL_NIF_TERM)(&outputRow[0]), C.unsigned(len(outputRow)))
 		output = append(output, erlRow)
 	}
-	enif_status := createEnifBinary(env, "error")
+	enif_status := createEnifAtom(env, "ok")
 	result := C.enif_make_list_from_array(env, (*C.ERL_NIF_TERM)(&output[0]), C.unsigned(len(output)))
 	return C.enif_make_tuple2(env, enif_status, result)
 }
@@ -51,7 +57,7 @@ func OpenFile(cFilename cstring) (cstring, uintptr) {
 	file, err := excelize.OpenFile(filename)
 	var cFilePtr uintptr
 	if err != nil {
-		println(err.Error())
+		fmt.Println(err.Error())
 		status := C.CString("error")
 		defer C.free(unsafe.Pointer(status))
 		return status, cFilePtr
@@ -87,23 +93,23 @@ func createEnifBinary(env *C.ErlNifEnv, message string) C.ERL_NIF_TERM {
 	bin := []byte(message)
 	binSize := C.size_t(len(bin))
 	var nifBin C.ErlNifBinary;
-	if C.enif_alloc_binary(binSize, &nifBin) == 1 {
+	if binSize > 0 && C.enif_alloc_binary(binSize, &nifBin) == 1 {
 		// ref: https://taiyoh.hatenablog.com/entry/2013/12/25/230905
-		data := (*reflect.SliceHeader)(unsafe.Pointer(&bin)).Data
-		nifBin.data = (*C.uchar)(unsafe.Pointer(data))
+		C.update_binary(&nifBin, unsafe.Pointer(&bin[0]), binSize)
 	}
 	return C.enif_make_binary(env, &nifBin)
 }
 
+func createEnifAtom(env *C.ErlNifEnv, message string) C.ERL_NIF_TERM {
+	cmessage := C.CString(message)
+	defer C.free(unsafe.Pointer(cmessage))
+	return C.enif_make_atom(env, cmessage)
+}
+
 // ref: https://stackoverflow.com/questions/59827026/cgo-convert-go-string-to-c-uchar
 func convertEnifBinaryToGoString(term C.ErlNifBinary) string {
-	c := term.data
-	var buf []byte
-	for *c != 0 {
-		buf = append(buf, (byte)(*c))
-		c = (*C.uchar)(unsafe.Pointer(uintptr(unsafe.Pointer(c)) + 1))
-	}
-	return string(buf)
+	c := (*C.char)(unsafe.Pointer(term.data))
+	return C.GoString(c)
 }
 
 func main() {}

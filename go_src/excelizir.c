@@ -5,7 +5,7 @@
 
 // erlang string と c string変換 https://stackoverflow.com/questions/12928943/how-do-you-return-a-string-from-an-erlang-c-node
 
-static ERL_NIF_TERM read_sheet(ErlNifEnv *env, int argc, const ERL_NIF_TERM argv[]) {
+ERL_NIF_TERM read_sheet(ErlNifEnv *env, int argc, const ERL_NIF_TERM argv[]) {
 	ErlNifBinary enifFilename;
 	ErlNifBinary enifSheetName;
 	enif_inspect_binary(env, argv[0], &enifFilename);
@@ -13,9 +13,9 @@ static ERL_NIF_TERM read_sheet(ErlNifEnv *env, int argc, const ERL_NIF_TERM argv
 	return ReadSheet(env, enifFilename, enifSheetName);
 }
 
-static ErlNifFunc bcrypt_nif_funcs[] =
+static ErlNifFunc excelixir_nif_funcs[] =
 {
 	{"read_sheet", 2, read_sheet},
 };
 
-ERL_NIF_INIT(Elixir.Bcrypt.Base, bcrypt_nif_funcs, NULL, NULL, NULL, NULL)
+ERL_NIF_INIT(Elixir.Excelizir.Base, excelixir_nif_funcs, NULL, NULL, NULL, NULL)
