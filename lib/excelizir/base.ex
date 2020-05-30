@@ -18,6 +18,9 @@ defmodule Excelizir.Base do
   def read_sheet(filename, sheetname)
   def read_sheet(_, _), do: :erlang.nif_error(:not_loaded)
 
+  def open_file(filename)
+  def open_file(_, _), do: :erlang.nif_error(:not_loaded)
+
   defp load_nif do
     # path = :filename.join('./go_src/nif_excelizir')
     path = :filename.join(:code.priv_dir(:excelizir), 'excelizir_nif')
