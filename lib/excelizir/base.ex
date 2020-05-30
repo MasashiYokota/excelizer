@@ -19,13 +19,13 @@ defmodule Excelizir.Base do
   def read_sheet(_, _), do: :erlang.nif_error(:not_loaded)
 
   def open_file(filename)
-  def open_file(_, _), do: :erlang.nif_error(:not_loaded)
+  def open_file(_), do: :erlang.nif_error(:not_loaded)
 
   def new_sheet(file_id, sheet_name)
   def new_sheet(_, _), do: :erlang.nif_error(:not_loaded)
 
-  def close_file(filename)
-  def close_file(_, _), do: :erlang.nif_error(:not_loaded)
+  def close_file(file_id)
+  def close_file(_), do: :erlang.nif_error(:not_loaded)
 
   defp load_nif do
     # path = :filename.join('./go_src/nif_excelizir')
