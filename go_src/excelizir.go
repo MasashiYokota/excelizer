@@ -65,6 +65,23 @@ func OpenFile(env *C.ErlNifEnv, enifFilename C.ErlNifBinary) C.ERL_NIF_TERM {
 	return C.enif_make_tuple2(env, status, erlFileId)
 }
 
+//export NewSheet
+func NewSheet(env *C.ErlNifEnv, enifFileId, enifSheetName C.ErlNifBinary) C.ERL_NIF_TERM {
+	sheetName := convertErlBinaryToGoString(enifSheetName)
+	fileId := convertErlBinaryToGoString(enifFileId)
+	file, ok := fileStore[fileId]
+	if ok == false {
+		status := convertGoStringToErlAtom(env, "error")
+		message := convertGoStringToErlBinary(env, "given invalid file id")
+		return C.enif_make_tuple2(env, status, message)
+	}
+	index := file.NewSheet(sheetName)
+	erlIndex := convertGoIntToErlInt(env, index)
+
+	status := convertGoStringToErlAtom(env, "ok")
+	return C.enif_make_tuple2(env, status, erlIndex)
+}
+
 //export CloseFile
 func CloseFile(env *C.ErlNifEnv, erlFileId C.ErlNifBinary) C.ERL_NIF_TERM {
 	fileId := convertErlBinaryToGoString(erlFileId)
@@ -101,6 +118,10 @@ func convertGoStringToErlAtom(env *C.ErlNifEnv, message string) C.ERL_NIF_TERM {
 	cmessage := C.CString(message)
 	defer C.free(unsafe.Pointer(cmessage))
 	return C.enif_make_atom(env, cmessage)
+}
+
+func convertGoIntToErlInt(env *C.ErlNifEnv, value int) C.ERL_NIF_TERM {
+	return C.enif_make_int64(env, C.ErlNifSInt64(value))
 }
 
 // ref: https://stackoverflow.com/questions/59827026/cgo-convert-go-string-to-c-uchar

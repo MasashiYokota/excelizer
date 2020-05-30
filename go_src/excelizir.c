@@ -17,6 +17,14 @@ ERL_NIF_TERM open_file(ErlNifEnv *env, int argc, const ERL_NIF_TERM argv[]) {
   return OpenFile(env, erl_filename);
 }
 
+ERL_NIF_TERM new_sheet(ErlNifEnv *env, int argc, const ERL_NIF_TERM argv[]) {
+  ErlNifBinary erl_file_id;
+  ErlNifBinary erl_sheet_name;
+  enif_inspect_binary(env, argv[0], &erl_file_id);
+  enif_inspect_binary(env, argv[1], &erl_sheet_name);
+  return NewSheet(env, erl_file_id, erl_sheet_name);
+}
+
 ERL_NIF_TERM close_file(ErlNifEnv *env, int argc, const ERL_NIF_TERM argv[]) {
   ErlNifBinary erl_file_id;
   enif_inspect_binary(env, argv[0], &erl_file_id);
