@@ -11,6 +11,7 @@ static void update_binary(ErlNifBinary* bin, void* str, size_t size) {
 */
 import "C"
 import (
+	"errors"
 	"fmt"
 	"unsafe"
 
@@ -85,7 +86,10 @@ func NewSheet(env *C.ErlNifEnv, enifFileId, enifSheetName C.ErlNifBinary) C.ERL_
 //export CloseFile
 func CloseFile(env *C.ErlNifEnv, erlFileId C.ErlNifBinary) C.ERL_NIF_TERM {
 	fileId := convertErlBinaryToGoString(erlFileId)
-	delete(fileStore, fileId)
+	err := releaseFilePtr(fileId)
+	if err != nil {
+		return convertGoStringToErlAtom(env, "error")
+	}
 	return convertGoStringToErlAtom(env, "ok")
 }
 
@@ -97,6 +101,15 @@ func registerFilePtr(file *excelize.File) string {
 	uuidStr := uuidObject.String()
 	fileStore[uuidStr] = file
 	return uuidStr
+}
+
+func releaseFilePtr(fileId string) (error) {
+	_, ok := fileStore[fileId]
+	if ok == false {
+		return errors.New("fileId not found")
+	}
+	delete(fileStore, fileId)
+	return nil
 }
 
 func convertGoStringToErlBinary(env *C.ErlNifEnv, message string) C.ERL_NIF_TERM {
