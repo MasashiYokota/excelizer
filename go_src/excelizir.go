@@ -105,6 +105,48 @@ func NewSheet(env *C.ErlNifEnv, argc C.int, argv *C.nif_arg_t) C.ERL_NIF_TERM {
 	return C.enif_make_tuple2(env, status, erlIndex)
 }
 
+//export SetCellValue
+func SetCellValue(env *C.ErlNifEnv, argc C.int, argv *C.nif_arg_t) C.ERL_NIF_TERM {
+	var erlFileId, erlSheetName, erlColumn C.ErlNifBinary;
+	erlFileIdTerm := C.get_arg(argv, 0)
+	erlSheetNameTerm := C.get_arg(argv, 1)
+	erlColumnTerm := C.get_arg(argv, 2)
+	erlValueTerm := C.get_arg(argv, 3)
+	C.enif_inspect_binary(env, erlFileIdTerm, &erlFileId);
+	C.enif_inspect_binary(env, erlSheetNameTerm, &erlSheetName);
+	C.enif_inspect_binary(env, erlColumnTerm, &erlColumn);
+
+	fileId := convertErlBinaryToGoString(erlFileId)
+	sheetName := convertErlBinaryToGoString(erlSheetName)
+	column := convertErlBinaryToGoString(erlColumn)
+	file, ok := fileStore[fileId]
+	if ok == false {
+		status := convertGoStringToErlAtom(env, "error")
+		message := convertGoStringToErlBinary(env, "given invalid file id")
+		return C.enif_make_tuple2(env, status, message)
+	}
+
+	if C.enif_is_binary(env, erlValueTerm) == 1 {
+		var erlValue C.ErlNifBinary;
+		C.enif_inspect_binary(env, erlValueTerm, &erlValue)
+		value := convertErlBinaryToGoString(erlValue)
+		file.SetCellValue(sheetName, column, value)
+		status := convertGoStringToErlAtom(env, "ok")
+		return C.enif_make_tuple2(env, status, erlFileIdTerm)
+	} else if C.enif_is_number(env, erlValueTerm) == 1 {
+		var cValue C.double;
+		C.enif_get_double(env, erlValueTerm, &cValue)
+		value := float64(cValue)
+		file.SetCellValue(sheetName, column, value)
+		status := convertGoStringToErlAtom(env, "ok")
+		return C.enif_make_tuple2(env, status, erlFileIdTerm)
+	} else {
+		status := convertGoStringToErlAtom(env, "error")
+		message := convertGoStringToErlBinary(env, "given invalid value type. supported types are binary or number")
+		return C.enif_make_tuple2(env, status, message)
+	}
+}
+
 //export CloseFile
 func CloseFile(env *C.ErlNifEnv, argc C.int, argv *C.nif_arg_t) C.ERL_NIF_TERM {
 	var erlFileId C.ErlNifBinary;
