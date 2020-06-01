@@ -27,6 +27,9 @@ defmodule Excelizir.Base do
   def set_cell_value(file_id, sheet_name, column, value_type, value)
   def set_cell_value(_, _, _, _, _), do: :erlang.nif_error(:not_loaded)
 
+  def set_cell_style(file_id, sheet_name, hcell, vcell, style)
+  def set_cell_style(_, _, _, _, _), do: :erlang.nif_error(:not_loaded)
+
   def close_file(file_id)
   def close_file(_), do: :erlang.nif_error(:not_loaded)
 
