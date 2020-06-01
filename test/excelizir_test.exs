@@ -3,8 +3,11 @@ defmodule ExcelizirTest do
   alias Excelizir.Base
 
   @tag timeout: :infinity
-  test "greets the world" do
-    Base.read_sheet("あああ.xlsx", "代表情報") |> IO.inspect()
-    Base.read_sheet("test.xlsx", "代表情報") |> IO.inspect()
+  test "create a new xlsx data" do
+    {:ok, file} = Base.new_file()
+    {:ok, _file} = Base.new_sheet(file, "hoge")
+    {:ok, file} = Base.set_cell_value(file, "hoge", "A1", "string", "test")
+    {:ok, file} = Base.save_as(file, "test.xlsx")
+    Base.close_file(file)
   end
 end
