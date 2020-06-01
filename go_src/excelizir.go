@@ -147,6 +147,28 @@ func SetCellValue(env *C.ErlNifEnv, argc C.int, argv *C.nif_arg_t) C.ERL_NIF_TER
 	}
 }
 
+//export SetActiveSheet
+func SetActiveSheet(env *C.ErlNifEnv, argc C.int, argv *C.nif_arg_t) C.ERL_NIF_TERM {
+	var erlFileId C.ErlNifBinary;
+	var erlSheetId C.ErlNifSInt64;
+	erlFileIdTerm := C.get_arg(argv, 0)
+	erlSheetIdTerm := C.get_arg(argv, 1)
+	C.enif_inspect_binary(env, erlFileIdTerm, &erlFileId);
+	C.enif_get_int64(env, erlSheetIdTerm, &erlSheetId);
+
+	fileId := convertErlBinaryToGoString(erlFileId)
+	sheetId := int(erlSheetId)
+	file, ok := fileStore[fileId]
+	if ok == false {
+		status := convertGoStringToErlAtom(env, "error")
+		message := convertGoStringToErlBinary(env, "given invalid file id")
+		return C.enif_make_tuple2(env, status, message)
+	}
+	file.SetActiveSheet(sheetId)
+	status := convertGoStringToErlAtom(env, "ok")
+	return C.enif_make_tuple2(env, status, erlFileIdTerm)
+}
+
 //export CloseFile
 func CloseFile(env *C.ErlNifEnv, argc C.int, argv *C.nif_arg_t) C.ERL_NIF_TERM {
 	var erlFileId C.ErlNifBinary;
