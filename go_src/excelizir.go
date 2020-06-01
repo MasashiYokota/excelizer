@@ -169,6 +169,31 @@ func SetActiveSheet(env *C.ErlNifEnv, argc C.int, argv *C.nif_arg_t) C.ERL_NIF_T
 	return C.enif_make_tuple2(env, status, erlFileIdTerm)
 }
 
+//export SaveAs
+func SaveAs(env *C.ErlNifEnv, argc C.int, argv *C.nif_arg_t) C.ERL_NIF_TERM {
+	var erlFileId, erlPath C.ErlNifBinary;
+	erlFileIdTerm := C.get_arg(argv, 0)
+	erlPathTerm := C.get_arg(argv, 1)
+	C.enif_inspect_binary(env, erlFileIdTerm, &erlFileId);
+	C.enif_inspect_binary(env, erlPathTerm, &erlPath);
+
+	fileId := convertErlBinaryToGoString(erlFileId)
+	path := convertErlBinaryToGoString(erlPath)
+	file, ok := fileStore[fileId]
+	if ok == false {
+		status := convertGoStringToErlAtom(env, "error")
+		message := convertGoStringToErlBinary(env, "given invalid file id")
+		return C.enif_make_tuple2(env, status, message)
+	}
+	if err := file.SaveAs(path); err != nil {
+		status := convertGoStringToErlAtom(env, "error")
+		message := convertGoStringToErlBinary(env, "failed to save")
+		return C.enif_make_tuple2(env, status, message)
+	}
+	status := convertGoStringToErlAtom(env, "ok")
+	return C.enif_make_tuple2(env, status, erlFileIdTerm)
+}
+
 //export CloseFile
 func CloseFile(env *C.ErlNifEnv, argc C.int, argv *C.nif_arg_t) C.ERL_NIF_TERM {
 	var erlFileId C.ErlNifBinary;

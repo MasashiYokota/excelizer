@@ -23,6 +23,10 @@ ERL_NIF_TERM set_active_sheet(ErlNifEnv *env, int argc, const ERL_NIF_TERM argv[
   return SetActiveSheet(env, argc, argv);
 }
 
+ERL_NIF_TERM save_as(ErlNifEnv *env, int argc, const ERL_NIF_TERM argv[]) {
+  return SaveAs(env, argc, argv);
+}
+
 ERL_NIF_TERM close_file(ErlNifEnv *env, int argc, const ERL_NIF_TERM argv[]) {
   return CloseFile(env, argc, argv);
 }
@@ -33,6 +37,7 @@ static ErlNifFunc excelixir_nif_funcs[] = {
   {"new_sheet", 2, new_sheet},
   {"set_cell_value", 4, set_cell_value},
   {"set_active_sheet", 2, set_active_sheet},
+  {"save_as", 2, save_as},
   {"close_file", 1, close_file},
 };
 
