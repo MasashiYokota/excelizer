@@ -186,6 +186,41 @@ func SetCellValue(env *C.ErlNifEnv, argc C.int, argv *C.nif_arg_t) C.ERL_NIF_TER
 	}
 }
 
+//export SetCellStyle
+func SetCellStyle(env *C.ErlNifEnv, argc C.int, argv *C.nif_arg_t) C.ERL_NIF_TERM {
+	var erlFileId, erlSheetName, erlVCell, erlHCell, erlStyle C.ErlNifBinary;
+	erlFileIdTerm := C.get_arg(argv, 0)
+	erlSheetNameTerm := C.get_arg(argv, 1)
+	erlHCellTerm := C.get_arg(argv, 2)
+	erlVCellTerm := C.get_arg(argv, 3)
+	erlStyleTerm := C.get_arg(argv, 4)
+	C.enif_inspect_binary(env, erlFileIdTerm, &erlFileId);
+	C.enif_inspect_binary(env, erlSheetNameTerm, &erlSheetName);
+	C.enif_inspect_binary(env, erlVCellTerm, &erlVCell);
+	C.enif_inspect_binary(env, erlHCellTerm, &erlHCell);
+	C.enif_inspect_binary(env, erlStyleTerm, &erlStyle);
+	fileId := convertErlBinaryToGoString(erlFileId)
+	sheetName := convertErlBinaryToGoString(erlSheetName)
+	vcell := convertErlBinaryToGoString(erlVCell)
+	hcell := convertErlBinaryToGoString(erlHCell)
+	style := convertErlBinaryToGoString(erlStyle)
+	file, ok := fileStore[fileId]
+	if ok == false {
+		status := convertGoStringToErlAtom(env, "error")
+		message := convertGoStringToErlBinary(env, "given invalid file id")
+		return C.enif_make_tuple2(env, status, message)
+	}
+	styleId, err := file.NewStyle(style)
+	if err != nil {
+		status := convertGoStringToErlAtom(env, "error")
+		message := convertGoStringToErlBinary(env, "given invalid style")
+		return C.enif_make_tuple2(env, status, message)
+	}
+	file.SetCellStyle(sheetName, hcell, vcell, styleId)
+	status := convertGoStringToErlAtom(env, "ok")
+	return C.enif_make_tuple2(env, status, erlFileIdTerm)
+}
+
 //export SetActiveSheet
 func SetActiveSheet(env *C.ErlNifEnv, argc C.int, argv *C.nif_arg_t) C.ERL_NIF_TERM {
 	var erlFileId C.ErlNifBinary;
