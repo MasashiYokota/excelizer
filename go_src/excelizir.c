@@ -11,6 +11,10 @@ ERL_NIF_TERM open_file(ErlNifEnv *env, int argc, const ERL_NIF_TERM argv[]) {
   return OpenFile(env, argc, argv);
 }
 
+ERL_NIF_TERM new_file(ErlNifEnv *env, int argc, const ERL_NIF_TERM argv[]) {
+  return NewFile(env, argc, argv);
+}
+
 ERL_NIF_TERM new_sheet(ErlNifEnv *env, int argc, const ERL_NIF_TERM argv[]) {
   return NewSheet(env, argc, argv);
 }
@@ -38,6 +42,7 @@ ERL_NIF_TERM close_file(ErlNifEnv *env, int argc, const ERL_NIF_TERM argv[]) {
 static ErlNifFunc excelixir_nif_funcs[] = {
   {"read_sheet", 2, read_sheet},
   {"open_file", 1, open_file},
+  {"new_file", 0, new_file},
   {"new_sheet", 2, new_sheet},
   {"set_cell_value", 5, set_cell_value},
   {"set_cell_style", 5, set_cell_style},

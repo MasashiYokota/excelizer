@@ -21,6 +21,9 @@ defmodule Excelizir.Base do
   def open_file(filename)
   def open_file(_), do: :erlang.nif_error(:not_loaded)
 
+  def new_file
+  def new_file, do: :erlang.nif_error(:not_loaded)
+
   def new_sheet(file_id, sheet_name)
   def new_sheet(_, _), do: :erlang.nif_error(:not_loaded)
 

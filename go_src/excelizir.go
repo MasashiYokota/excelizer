@@ -83,6 +83,17 @@ func OpenFile(env *C.ErlNifEnv, argc C.int, argv *C.nif_arg_t) C.ERL_NIF_TERM {
 	return C.enif_make_tuple2(env, status, erlFileId)
 }
 
+//export NewFile
+func NewFile(env *C.ErlNifEnv, argc C.int, argv *C.nif_arg_t) C.ERL_NIF_TERM {
+	file := excelize.NewFile()
+	fileId := registerFilePtr(file)
+	erlFileId := convertGoStringToErlBinary(env, fileId)
+	status := convertGoStringToErlAtom(env, "ok")
+
+	return C.enif_make_tuple2(env, status, erlFileId)
+}
+
+
 //export NewSheet
 func NewSheet(env *C.ErlNifEnv, argc C.int, argv *C.nif_arg_t) C.ERL_NIF_TERM {
 	var erlFileId, erlSheetName C.ErlNifBinary;
