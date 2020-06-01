@@ -4,8 +4,14 @@ package main
 #include "erl_nif.h"
 #include <string.h>
 
+typedef const ERL_NIF_TERM nif_arg_t;
+
 static void update_binary(ErlNifBinary* bin, void* str, size_t size) {
 	memcpy(bin->data, str, size);
+}
+
+static ERL_NIF_TERM get_arg(ERL_NIF_TERM* arg, int index) {
+	return arg[index];
 }
 
 */
@@ -24,9 +30,15 @@ type cstring *C.char
 var fileStore map[string]*excelize.File
 
 //export ReadSheet
-func ReadSheet(env *C.ErlNifEnv, enifFilename, enifSheetName C.ErlNifBinary) C.ERL_NIF_TERM {
-	filename := convertErlBinaryToGoString(enifFilename)
-	sheetName := convertErlBinaryToGoString(enifSheetName)
+func ReadSheet(env *C.ErlNifEnv, argc C.int, argv *C.nif_arg_t) C.ERL_NIF_TERM {
+	var erlFilename, erlSheetName C.ErlNifBinary;
+	erlFilenameTerm := C.get_arg(argv, 0)
+	erlSheetNameTerm := C.get_arg(argv, 1)
+	C.enif_inspect_binary(env, erlFilenameTerm, &erlFilename);
+	C.enif_inspect_binary(env, erlSheetNameTerm, &erlSheetName);
+
+	filename := convertErlBinaryToGoString(erlFilename)
+	sheetName := convertErlBinaryToGoString(erlSheetName)
 	var output []C.ERL_NIF_TERM
 	file, err := excelize.OpenFile(filename)
 	if err != nil {
@@ -50,8 +62,12 @@ func ReadSheet(env *C.ErlNifEnv, enifFilename, enifSheetName C.ErlNifBinary) C.E
 }
 
 //export OpenFile
-func OpenFile(env *C.ErlNifEnv, enifFilename C.ErlNifBinary) C.ERL_NIF_TERM {
-	filename := convertErlBinaryToGoString(enifFilename)
+func OpenFile(env *C.ErlNifEnv, argc C.int, argv *C.nif_arg_t) C.ERL_NIF_TERM {
+	var erlFilename C.ErlNifBinary;
+	erlFilenameTerm := C.get_arg(argv, 0)
+	C.enif_inspect_binary(env,erlFilenameTerm, &erlFilename);
+
+	filename := convertErlBinaryToGoString(erlFilename)
 	file, err := excelize.OpenFile(filename)
 	if err != nil {
 		fmt.Println(err.Error())
@@ -67,9 +83,15 @@ func OpenFile(env *C.ErlNifEnv, enifFilename C.ErlNifBinary) C.ERL_NIF_TERM {
 }
 
 //export NewSheet
-func NewSheet(env *C.ErlNifEnv, enifFileId, enifSheetName C.ErlNifBinary) C.ERL_NIF_TERM {
-	sheetName := convertErlBinaryToGoString(enifSheetName)
-	fileId := convertErlBinaryToGoString(enifFileId)
+func NewSheet(env *C.ErlNifEnv, argc C.int, argv *C.nif_arg_t) C.ERL_NIF_TERM {
+	var erlFileId, erlSheetName C.ErlNifBinary;
+	erlFileIdTerm := C.get_arg(argv, 0)
+	erlSheetNameTerm := C.get_arg(argv, 1)
+	C.enif_inspect_binary(env, erlFileIdTerm, &erlFileId);
+	C.enif_inspect_binary(env, erlSheetNameTerm, &erlSheetName);
+
+	sheetName := convertErlBinaryToGoString(erlSheetName)
+	fileId := convertErlBinaryToGoString(erlFileId)
 	file, ok := fileStore[fileId]
 	if ok == false {
 		status := convertGoStringToErlAtom(env, "error")
@@ -84,7 +106,10 @@ func NewSheet(env *C.ErlNifEnv, enifFileId, enifSheetName C.ErlNifBinary) C.ERL_
 }
 
 //export CloseFile
-func CloseFile(env *C.ErlNifEnv, erlFileId C.ErlNifBinary) C.ERL_NIF_TERM {
+func CloseFile(env *C.ErlNifEnv, argc C.int, argv *C.nif_arg_t) C.ERL_NIF_TERM {
+	var erlFileId C.ErlNifBinary;
+	erlFileIdTerm := C.get_arg(argv, 0)
+	C.enif_inspect_binary(env, erlFileIdTerm, &erlFileId);
 	fileId := convertErlBinaryToGoString(erlFileId)
 	err := releaseFilePtr(fileId)
 	if err != nil {
@@ -135,6 +160,14 @@ func convertGoStringToErlAtom(env *C.ErlNifEnv, message string) C.ERL_NIF_TERM {
 
 func convertGoIntToErlInt(env *C.ErlNifEnv, value int) C.ERL_NIF_TERM {
 	return C.enif_make_int64(env, C.ErlNifSInt64(value))
+}
+
+func convertErlNumberToGoFloat64(env *C.ErlNifEnv, erlValue C.ERL_NIF_TERM) (float64, error) {
+	var cValue C.double
+	if C.enif_get_double(env, erlValue, &cValue) == 0 {
+		return 0, errors.New("invalid erlang type")
+	}
+	return float64(cValue), nil
 }
 
 // ref: https://stackoverflow.com/questions/59827026/cgo-convert-go-string-to-c-uchar
