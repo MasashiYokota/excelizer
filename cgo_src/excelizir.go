@@ -141,60 +141,15 @@ func SetCellValue(env *C.ErlNifEnv, argc C.int, argv *C.nif_arg_t) C.ERL_NIF_TER
 		return C.enif_make_tuple2(env, status, message)
 	}
 
-	if valueType == "string" && C.enif_is_binary(env, erlValueTerm) == 1 {
-		var erlValue C.ErlNifBinary;
-		C.enif_inspect_binary(env, erlValueTerm, &erlValue)
-		value := convertErlBinaryToGoString(erlValue)
-		file.SetCellStr(sheetName, column, value)
-		status := convertGoStringToErlAtom(env, "ok")
-		return C.enif_make_tuple2(env, status, erlFileIdTerm)
-	} else if valueType == "float" && C.enif_is_number(env, erlValueTerm) == 1 {
-		var cValue C.double;
-		C.enif_get_double(env, erlValueTerm, &cValue)
-		value := float64(cValue)
-		file.SetCellValue(sheetName, column, value)
-		status := convertGoStringToErlAtom(env, "ok")
-		return C.enif_make_tuple2(env, status, erlFileIdTerm)
-	} else if valueType == "int" && C.enif_is_number(env, erlValueTerm) == 1 {
-		var cValue C.ErlNifSInt64;
-		C.enif_get_int64(env, erlValueTerm, &cValue)
-		value := int(cValue)
-		file.SetCellInt(sheetName, column, value)
-		status := convertGoStringToErlAtom(env, "ok")
-		return C.enif_make_tuple2(env, status, erlFileIdTerm)
-	} else if valueType == "boolean" && C.enif_is_binary(env, erlValueTerm) == 1 {
-		var erlValue C.ErlNifBinary;
-		C.enif_inspect_binary(env, erlValueTerm, &erlValue)
-		value := convertErlBinaryToGoString(erlValue)
-		if value == "true" {
-			file.SetCellBool(sheetName, column, true)
-		} else if value == "false" {
-			file.SetCellBool(sheetName, column, false)
-		} else {
-			status := convertGoStringToErlAtom(env, "error")
-			message := convertGoStringToErlBinary(env, "invalid boolean value: boolean type value must be 'true' or 'false' string")
-			return C.enif_make_tuple2(env, status, message)
-		}
-		status := convertGoStringToErlAtom(env, "ok")
-		return C.enif_make_tuple2(env, status, erlFileIdTerm)
-	} else if valueType == "datetime" && C.enif_is_binary(env, erlValueTerm) == 1 {
-		var erlValue C.ErlNifBinary;
-		C.enif_inspect_binary(env, erlValueTerm, &erlValue)
-		value := convertErlBinaryToGoString(erlValue)
-		timeValue, err := time.Parse(time.RFC3339, value)
-		if err != nil {
-			status := convertGoStringToErlAtom(env, "error")
-			message := convertGoStringToErlBinary(env, "invalid datetime value format: datetime format must be RFC3339")
-			return C.enif_make_tuple2(env, status, message)
-		}
-		file.SetCellValue(sheetName, column, timeValue)
-		status := convertGoStringToErlAtom(env, "ok")
-		return C.enif_make_tuple2(env, status, erlFileIdTerm)
-	} else {
+	value, err := convertErlTermToColumnValue(env, erlValueTerm, valueType)
+	if err != nil {
 		status := convertGoStringToErlAtom(env, "error")
-		message := convertGoStringToErlBinary(env, "given invalid value type. supported types are binary or number")
+		message := convertGoStringToErlBinary(env, err.Error())
 		return C.enif_make_tuple2(env, status, message)
 	}
+	file.SetCellValue(sheetName, column, value)
+	status := convertGoStringToErlAtom(env, "ok")
+	return C.enif_make_tuple2(env, status, erlFileIdTerm)
 }
 
 //export SetCellStyle
@@ -348,6 +303,49 @@ func convertErlNumberToGoFloat64(env *C.ErlNifEnv, erlValue C.ERL_NIF_TERM) (flo
 func convertErlBinaryToGoString(term C.ErlNifBinary) string {
 	c := (*C.char)(unsafe.Pointer(term.data))
 	return C.GoString(c)
+}
+
+func convertErlTermToColumnValue(env *C.ErlNifEnv, erlValueTerm C.ERL_NIF_TERM, valueType string) (interface{}, error) {
+	if valueType == "string" && C.enif_is_binary(env, erlValueTerm) == 1 {
+		var erlValue C.ErlNifBinary;
+		C.enif_inspect_binary(env, erlValueTerm, &erlValue)
+		value := convertErlBinaryToGoString(erlValue)
+		return value, nil
+	} else if valueType == "float" && C.enif_is_number(env, erlValueTerm) == 1 {
+		var cValue C.double;
+		C.enif_get_double(env, erlValueTerm, &cValue)
+		value := float64(cValue)
+		return value, nil
+	} else if valueType == "int" && C.enif_is_number(env, erlValueTerm) == 1 {
+		var cValue C.ErlNifSInt64;
+		C.enif_get_int64(env, erlValueTerm, &cValue)
+		value := int(cValue)
+		return value, nil
+	} else if valueType == "boolean" && C.enif_is_binary(env, erlValueTerm) == 1 {
+		var erlValue C.ErlNifBinary;
+		C.enif_inspect_binary(env, erlValueTerm, &erlValue)
+		value := convertErlBinaryToGoString(erlValue)
+		if value == "true" {
+			return true, nil
+		} else if value == "false" {
+			return false, nil
+		} else {
+			return nil, errors.New("invalid boolean value: boolean type value must be 'true' or 'false' string")
+		}
+	} else if valueType == "datetime" && C.enif_is_binary(env, erlValueTerm) == 1 {
+		var erlValue C.ErlNifBinary;
+		C.enif_inspect_binary(env, erlValueTerm, &erlValue)
+		value := convertErlBinaryToGoString(erlValue)
+		timeValue, err := time.Parse(time.RFC3339, value)
+		if err != nil {
+			return nil, errors.New("invalid datetime value format: datetime format must be RFC3339")
+		}
+		return timeValue, nil
+	} else if valueType == "nil" {
+		return nil, nil
+	} else {
+		return nil, errors.New("given invalid value type. supported types are binary or number")
+	}
 }
 
 func main() {}
