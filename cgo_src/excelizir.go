@@ -22,7 +22,7 @@ import (
 	"time"
 	"unsafe"
 
-	"github.com/360EntSecGroup-Skylar/excelize"
+	"github.com/360EntSecGroup-Skylar/excelize/v2"
 	"github.com/google/uuid"
 )
 
@@ -48,7 +48,12 @@ func ReadSheet(env *C.ErlNifEnv, argc C.int, argv *C.nif_arg_t) C.ERL_NIF_TERM {
 		message := convertGoStringToErlBinary(env, "load error")
 		return C.enif_make_tuple2(env, status, message)
 	}
-	rows := file.GetRows(sheetName)
+	rows, err := file.GetRows(sheetName)
+	if err != nil {
+		status := convertGoStringToErlAtom(env, "error")
+		message := convertGoStringToErlBinary(env, err.Error())
+		return C.enif_make_tuple2(env, status, message)
+	}
 	for _, row := range rows {
 		var outputRow []C.ERL_NIF_TERM;
 		for _, col := range row {
@@ -148,6 +153,86 @@ func SetCellValue(env *C.ErlNifEnv, argc C.int, argv *C.nif_arg_t) C.ERL_NIF_TER
 		return C.enif_make_tuple2(env, status, message)
 	}
 	file.SetCellValue(sheetName, column, value)
+	status := convertGoStringToErlAtom(env, "ok")
+	return C.enif_make_tuple2(env, status, erlFileIdTerm)
+}
+
+//export SetRow
+func SetRow(env *C.ErlNifEnv, argc C.int, argv *C.nif_arg_t) C.ERL_NIF_TERM {
+	var erlFileId, erlSheetName, erlColumn C.ErlNifBinary;
+	erlFileIdTerm := C.get_arg(argv, 0)
+	erlSheetNameTerm := C.get_arg(argv, 1)
+	erlColumnTerm := C.get_arg(argv, 2)
+	erlRowsTerm := C.get_arg(argv, 3)
+	C.enif_inspect_binary(env, erlFileIdTerm, &erlFileId);
+	C.enif_inspect_binary(env, erlSheetNameTerm, &erlSheetName);
+	C.enif_inspect_binary(env, erlColumnTerm, &erlColumn);
+
+	fileId := convertErlBinaryToGoString(erlFileId)
+	sheetName := convertErlBinaryToGoString(erlSheetName)
+	column := convertErlBinaryToGoString(erlColumn)
+	file, ok := fileStore[fileId]
+	if ok == false {
+		status := convertGoStringToErlAtom(env, "error")
+		message := convertGoStringToErlBinary(env, "given invalid file id")
+		return C.enif_make_tuple2(env, status, message)
+	}
+	streamWriter, err := file.NewStreamWriter(sheetName)
+	if err != nil {
+		status := convertGoStringToErlAtom(env, "error")
+		message := convertGoStringToErlBinary(env, err.Error())
+		return C.enif_make_tuple2(env, status, message)
+	}
+	var rows []interface{}
+	var styleIDStore map[string]int
+	var erlHeadTerm, erlTailTerm C.ERL_NIF_TERM
+	for C.enif_get_list_cell(env, erlRowsTerm, &erlHeadTerm, &erlTailTerm) != 0 {
+		var erlTupleTerm *C.ERL_NIF_TERM
+		var cTupleLength C.int
+		if C.enif_get_tuple(env, erlTailTerm, &cTupleLength, &erlTupleTerm) == 0 {
+			status := convertGoStringToErlAtom(env, "error")
+			message := convertGoStringToErlBinary(env, "Invalid tuple error: tuple length must be 3")
+			return C.enif_make_tuple2(env, status, message)
+		}
+		var erlValueType, erlStyle C.ErlNifBinary
+		erlValueTypeTerm := C.get_arg(erlTupleTerm, 0)
+		erlStyleTerm := C.get_arg(erlTupleTerm, 1)
+		erlValueTerm := C.get_arg(erlTupleTerm, 2)
+		C.enif_inspect_binary(env, erlValueTypeTerm, &erlValueType)
+		C.enif_inspect_binary(env, erlStyleTerm, &erlStyle)
+		style := convertErlBinaryToGoString(erlStyle)
+		var styleID int
+		styleID, ok = styleIDStore[style]
+		if !ok {
+			styleID, err = file.NewStyle(style)
+			if err != nil {
+				status := convertGoStringToErlAtom(env, "error")
+				message := convertGoStringToErlBinary(env, err.Error())
+				return C.enif_make_tuple2(env, status, message)
+			}
+			styleIDStore[style] = styleID
+		}
+
+		valueType := convertErlBinaryToGoString(erlValueType)
+		value, err := convertErlTermToColumnValue(env, erlValueTerm, valueType)
+		if err != nil {
+			status := convertGoStringToErlAtom(env, "error")
+			message := convertGoStringToErlBinary(env, err.Error())
+			return C.enif_make_tuple2(env, status, message)
+		}
+		rows = append(rows, excelize.Cell{StyleID: styleID, Value: value})
+	}
+
+	if err = streamWriter.SetRow(column, rows); err != nil {
+		status := convertGoStringToErlAtom(env, "error")
+		message := convertGoStringToErlBinary(env, err.Error())
+		return C.enif_make_tuple2(env, status, message)
+	}
+	if err := streamWriter.Flush(); err != nil {
+		status := convertGoStringToErlAtom(env, "error")
+		message := convertGoStringToErlBinary(env, err.Error())
+		return C.enif_make_tuple2(env, status, message)
+	}
 	status := convertGoStringToErlAtom(env, "ok")
 	return C.enif_make_tuple2(env, status, erlFileIdTerm)
 }

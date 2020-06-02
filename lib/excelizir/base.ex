@@ -33,6 +33,9 @@ defmodule Excelizir.Base do
   def set_cell_style(file_id, sheet_name, hcell, vcell, style)
   def set_cell_style(_, _, _, _, _), do: :erlang.nif_error(:not_loaded)
 
+  def set_row(file_id, sheet_name, column, rows)
+  def set_row(_, _, _, _), do: :erlang.nif_error(:not_loaded)
+
   def set_active_sheet(file_id, sheet_id)
   def set_active_sheet(_, _), do: :erlang.nif_error(:not_loaded)
 
