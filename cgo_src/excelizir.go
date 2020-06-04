@@ -18,7 +18,6 @@ static ERL_NIF_TERM get_arg(ERL_NIF_TERM* arg, int index) {
 import "C"
 import (
 	"errors"
-	"fmt"
 	"time"
 	"unsafe"
 
@@ -45,16 +44,11 @@ func ReadSheet(env *C.ErlNifEnv, argc C.int, argv *C.nif_arg_t) C.ERL_NIF_TERM {
 	var output []C.ERL_NIF_TERM
 	file, err := excelize.OpenFile(filename)
 	if err != nil {
-		fmt.Println(err.Error())
-		status := convertGoStringToErlAtom(env, "error")
-		message := convertGoStringToErlBinary(env, "load error")
-		return C.enif_make_tuple2(env, status, message)
+		return returnErrorStatusWithMessage(env, err.Error())
 	}
 	rows, err := file.GetRows(sheetName)
 	if err != nil {
-		status := convertGoStringToErlAtom(env, "error")
-		message := convertGoStringToErlBinary(env, err.Error())
-		return C.enif_make_tuple2(env, status, message)
+		return returnErrorStatusWithMessage(env, err.Error())
 	}
 	for _, row := range rows {
 		var outputRow []C.ERL_NIF_TERM;
@@ -78,10 +72,7 @@ func OpenFile(env *C.ErlNifEnv, argc C.int, argv *C.nif_arg_t) C.ERL_NIF_TERM {
 	filename := convertErlBinaryToGoString(erlFilename)
 	file, err := excelize.OpenFile(filename)
 	if err != nil {
-		fmt.Println(err.Error())
-		status := convertGoStringToErlAtom(env, "error")
-		message := convertGoStringToErlBinary(env, "failed to open file")
-		return C.enif_make_tuple2(env, status, message)
+		return returnErrorStatusWithMessage(env, err.Error())
 	}
 	fileId := registerFilePtr(file)
 	erlFileId := convertGoStringToErlBinary(env, fileId)
@@ -112,14 +103,10 @@ func SaveAs(env *C.ErlNifEnv, argc C.int, argv *C.nif_arg_t) C.ERL_NIF_TERM {
 	path := convertErlBinaryToGoString(erlPath)
 	file, ok := fileStore[fileId]
 	if ok == false {
-		status := convertGoStringToErlAtom(env, "error")
-		message := convertGoStringToErlBinary(env, "given invalid file id")
-		return C.enif_make_tuple2(env, status, message)
+		return returnErrorStatusWithMessage(env,  "given invalid file id")
 	}
 	if err := file.SaveAs(path); err != nil {
-		status := convertGoStringToErlAtom(env, "error")
-		message := convertGoStringToErlBinary(env, "failed to save")
-		return C.enif_make_tuple2(env, status, message)
+		return returnErrorStatusWithMessage(env,  err.Error())
 	}
 	status := convertGoStringToErlAtom(env, "ok")
 	return C.enif_make_tuple2(env, status, erlFileIdTerm)
@@ -152,9 +139,7 @@ func NewSheet(env *C.ErlNifEnv, argc C.int, argv *C.nif_arg_t) C.ERL_NIF_TERM {
 	fileId := convertErlBinaryToGoString(erlFileId)
 	file, ok := fileStore[fileId]
 	if ok == false {
-		status := convertGoStringToErlAtom(env, "error")
-		message := convertGoStringToErlBinary(env, "given invalid file id")
-		return C.enif_make_tuple2(env, status, message)
+		return returnErrorStatusWithMessage(env, "given invalid file id")
 	}
 	index := file.NewSheet(sheetName)
 	erlIndex := convertGoIntToErlInt(env, index)
@@ -176,9 +161,7 @@ func SetActiveSheet(env *C.ErlNifEnv, argc C.int, argv *C.nif_arg_t) C.ERL_NIF_T
 	sheetId := int(erlSheetId)
 	file, ok := fileStore[fileId]
 	if ok == false {
-		status := convertGoStringToErlAtom(env, "error")
-		message := convertGoStringToErlBinary(env, "given invalid file id")
-		return C.enif_make_tuple2(env, status, message)
+		return returnErrorStatusWithMessage(env, "given invalid file id")
 	}
 	file.SetActiveSheet(sheetId)
 	status := convertGoStringToErlAtom(env, "ok")
@@ -206,16 +189,12 @@ func SetCellValue(env *C.ErlNifEnv, argc C.int, argv *C.nif_arg_t) C.ERL_NIF_TER
 	valueType := convertErlBinaryToGoString(erlValueType)
 	file, ok := fileStore[fileId]
 	if ok == false {
-		status := convertGoStringToErlAtom(env, "error")
-		message := convertGoStringToErlBinary(env, "given invalid file id")
-		return C.enif_make_tuple2(env, status, message)
+		return returnErrorStatusWithMessage(env, "given invalid file id")
 	}
 
 	value, err := convertErlTermToColumnValue(env, erlValueTerm, valueType)
 	if err != nil {
-		status := convertGoStringToErlAtom(env, "error")
-		message := convertGoStringToErlBinary(env, err.Error())
-		return C.enif_make_tuple2(env, status, message)
+		return returnErrorStatusWithMessage(env, err.Error())
 	}
 	file.SetCellValue(sheetName, column, value)
 	status := convertGoStringToErlAtom(env, "ok")
@@ -242,15 +221,11 @@ func SetCellStyle(env *C.ErlNifEnv, argc C.int, argv *C.nif_arg_t) C.ERL_NIF_TER
 	style := convertErlBinaryToGoString(erlStyle)
 	file, ok := fileStore[fileId]
 	if ok == false {
-		status := convertGoStringToErlAtom(env, "error")
-		message := convertGoStringToErlBinary(env, "given invalid file id")
-		return C.enif_make_tuple2(env, status, message)
+		return returnErrorStatusWithMessage(env, "given invalid file id")
 	}
 	styleId, err := file.NewStyle(style)
 	if err != nil {
-		status := convertGoStringToErlAtom(env, "error")
-		message := convertGoStringToErlBinary(env, "given invalid style")
-		return C.enif_make_tuple2(env, status, message)
+		return returnErrorStatusWithMessage(env, err.Error())
 	}
 	file.SetCellStyle(sheetName, hcell, vcell, styleId)
 	status := convertGoStringToErlAtom(env, "ok")
@@ -275,15 +250,11 @@ func SetRow(env *C.ErlNifEnv, argc C.int, argv *C.nif_arg_t) C.ERL_NIF_TERM {
 	column := convertErlBinaryToGoString(erlColumn)
 	file, ok := fileStore[fileId]
 	if ok == false {
-		status := convertGoStringToErlAtom(env, "error")
-		message := convertGoStringToErlBinary(env, "given invalid file id")
-		return C.enif_make_tuple2(env, status, message)
+		return returnErrorStatusWithMessage(env, "given invalid file id")
 	}
 	streamWriter, err := file.NewStreamWriter(sheetName)
 	if err != nil {
-		status := convertGoStringToErlAtom(env, "error")
-		message := convertGoStringToErlBinary(env, err.Error())
-		return C.enif_make_tuple2(env, status, message)
+		return returnErrorStatusWithMessage(env, err.Error())
 	}
 	var rows []interface{}
 	var styleIDStore map[string]int
@@ -292,9 +263,7 @@ func SetRow(env *C.ErlNifEnv, argc C.int, argv *C.nif_arg_t) C.ERL_NIF_TERM {
 		var erlTupleTerm *C.ERL_NIF_TERM
 		var cTupleLength C.int
 		if C.enif_get_tuple(env, erlTailTerm, &cTupleLength, &erlTupleTerm) == 0 {
-			status := convertGoStringToErlAtom(env, "error")
-			message := convertGoStringToErlBinary(env, "Invalid tuple error: tuple length must be 3")
-			return C.enif_make_tuple2(env, status, message)
+			return returnErrorStatusWithMessage(env, "Invalid tuple error: tuple length must be 3")
 		}
 		var erlValueType, erlStyle C.ErlNifBinary
 		erlValueTypeTerm := C.get_arg(erlTupleTerm, 0)
@@ -308,9 +277,7 @@ func SetRow(env *C.ErlNifEnv, argc C.int, argv *C.nif_arg_t) C.ERL_NIF_TERM {
 		if !ok {
 			styleID, err = file.NewStyle(style)
 			if err != nil {
-				status := convertGoStringToErlAtom(env, "error")
-				message := convertGoStringToErlBinary(env, err.Error())
-				return C.enif_make_tuple2(env, status, message)
+				return returnErrorStatusWithMessage(env, err.Error())
 			}
 			styleIDStore[style] = styleID
 		}
@@ -318,22 +285,16 @@ func SetRow(env *C.ErlNifEnv, argc C.int, argv *C.nif_arg_t) C.ERL_NIF_TERM {
 		valueType := convertErlBinaryToGoString(erlValueType)
 		value, err := convertErlTermToColumnValue(env, erlValueTerm, valueType)
 		if err != nil {
-			status := convertGoStringToErlAtom(env, "error")
-			message := convertGoStringToErlBinary(env, err.Error())
-			return C.enif_make_tuple2(env, status, message)
+			return returnErrorStatusWithMessage(env, err.Error())
 		}
 		rows = append(rows, excelize.Cell{StyleID: styleID, Value: value})
 	}
 
 	if err = streamWriter.SetRow(column, rows); err != nil {
-		status := convertGoStringToErlAtom(env, "error")
-		message := convertGoStringToErlBinary(env, err.Error())
-		return C.enif_make_tuple2(env, status, message)
+		return returnErrorStatusWithMessage(env, err.Error())
 	}
 	if err := streamWriter.Flush(); err != nil {
-		status := convertGoStringToErlAtom(env, "error")
-		message := convertGoStringToErlBinary(env, err.Error())
-		return C.enif_make_tuple2(env, status, message)
+		return returnErrorStatusWithMessage(env, err.Error())
 	}
 	status := convertGoStringToErlAtom(env, "ok")
 	return C.enif_make_tuple2(env, status, erlFileIdTerm)
@@ -440,6 +401,12 @@ func convertErlTermToColumnValue(env *C.ErlNifEnv, erlValueTerm C.ERL_NIF_TERM, 
 	} else {
 		return nil, errors.New("given invalid value type. supported types are binary or number")
 	}
+}
+
+func returnErrorStatusWithMessage(env *C.ErlNifEnv, message string) C.ERL_NIF_TERM {
+	status := convertGoStringToErlAtom(env, "error")
+	messageBinary := convertGoStringToErlBinary(env, message)
+	return C.enif_make_tuple2(env, status, messageBinary)
 }
 
 func main() {}
