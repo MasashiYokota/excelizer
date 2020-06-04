@@ -8,7 +8,7 @@ ERL_NIF_TERM read_sheet(ErlNifEnv *env, int argc, const ERL_NIF_TERM argv[]) {
 }
 
 ERL_NIF_TERM open_file(ErlNifEnv *env, int argc, const ERL_NIF_TERM argv[]) {
-  return OpenFile(env, argc, argv);
+  return enif_schedule_nif(env, "OpenFile", ERL_NIF_DIRTY_JOB_IO_BOUND, OpenFile, argc, argv);
 }
 
 ERL_NIF_TERM new_file(ErlNifEnv *env, int argc, const ERL_NIF_TERM argv[]) {
@@ -28,7 +28,7 @@ ERL_NIF_TERM set_cell_style(ErlNifEnv *env, int argc, const ERL_NIF_TERM argv[])
 }
 
 ERL_NIF_TERM set_row(ErlNifEnv *env, int argc, const ERL_NIF_TERM argv[]) {
-  return SetRow(env, argc, argv);
+  return enif_schedule_nif(env, "SetRow", ERL_NIF_DIRTY_JOB_CPU_BOUND, SetRow, argc, argv);
 }
 
 ERL_NIF_TERM set_active_sheet(ErlNifEnv *env, int argc, const ERL_NIF_TERM argv[]) {
@@ -36,7 +36,7 @@ ERL_NIF_TERM set_active_sheet(ErlNifEnv *env, int argc, const ERL_NIF_TERM argv[
 }
 
 ERL_NIF_TERM save_as(ErlNifEnv *env, int argc, const ERL_NIF_TERM argv[]) {
-  return SaveAs(env, argc, argv);
+  return enif_schedule_nif(env, "SaveAs", ERL_NIF_DIRTY_JOB_IO_BOUND, SaveAs, argc, argv);
 }
 
 ERL_NIF_TERM close_file(ErlNifEnv *env, int argc, const ERL_NIF_TERM argv[]) {
