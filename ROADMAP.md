@@ -9,7 +9,7 @@
 - [x] CopySheet
 - [x] SetSheetBackground
 - [x] SetActiveSheet
-- [ ] GetActiveSheetIndex
+- [x] GetActiveSheetIndex
 - [ ] SetSheetVisible
 - [ ] GetSheetVisible
 - [ ] SetSheetFormatPr

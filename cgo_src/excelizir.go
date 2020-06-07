@@ -196,6 +196,23 @@ func SetSheetBackground(env *C.ErlNifEnv, argc C.int, argv *C.nif_arg_t) C.ERL_N
 	return C.enif_make_tuple2(env, status, erlFileIdTerm)
 }
 
+//export GetActiveSheetIndex
+func GetActiveSheetIndex(env *C.ErlNifEnv, argc C.int, argv *C.nif_arg_t) C.ERL_NIF_TERM {
+	var erlFileId C.ErlNifBinary;
+	erlFileIdTerm := C.get_arg(argv, 0)
+	C.enif_inspect_binary(env, erlFileIdTerm, &erlFileId);
+
+	fileId := convertErlBinaryToGoString(erlFileId)
+	file, ok := fileStore[fileId]
+	if ok == false {
+		return returnErrorStatusWithMessage(env,  "given invalid file id")
+	}
+	activeSheetIndex := file.GetActiveSheetIndex()
+	erlActiveSheetIndexTerm := convertGoIntToErlInt(env, activeSheetIndex)
+	status := convertGoStringToErlAtom(env, "ok")
+	return C.enif_make_tuple2(env, status, erlActiveSheetIndexTerm)
+}
+
 //export CloseFile
 func CloseFile(env *C.ErlNifEnv, argc C.int, argv *C.nif_arg_t) C.ERL_NIF_TERM {
 	var erlFileId C.ErlNifBinary;

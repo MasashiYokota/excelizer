@@ -45,6 +45,9 @@ defmodule Excelizir.Base do
   def set_sheet_background(file_id, sheet_name, picture_path)
   def set_sheet_background(_, _, _), do: :erlang.nif_error(:not_loaded)
 
+  def get_active_sheet_index(file_id)
+  def get_active_sheet_index(_), do: :erlang.nif_error(:not_loaded)
+
   def close_file(file_id)
   def close_file(_), do: :erlang.nif_error(:not_loaded)
 
