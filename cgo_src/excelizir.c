@@ -33,6 +33,10 @@ ERL_NIF_TERM save(ErlNifEnv *env, int argc, const ERL_NIF_TERM argv[]) {
   return enif_schedule_nif(env, "Save", ERL_NIF_DIRTY_JOB_IO_BOUND, Save, argc, argv);
 }
 
+ERL_NIF_TERM delete_sheet(ErlNifEnv *env, int argc, const ERL_NIF_TERM argv[]) {
+	return DeleteSheet(env, argc, argv);
+}
+
 ERL_NIF_TERM close_file(ErlNifEnv *env, int argc, const ERL_NIF_TERM argv[]) {
   return CloseFile(env, argc, argv);
 }
@@ -59,6 +63,7 @@ static ErlNifFunc excelixir_nif_funcs[] = {
   {"set_active_sheet", 2, set_active_sheet},
   {"save_as", 2, save_as},
   {"save", 0, save},
+  {"delete_sheet", 2, delete_sheet},
   {"close_file", 1, close_file},
   {"set_cell_value", 5, set_cell_value},
   {"set_cell_style", 5, set_cell_style},

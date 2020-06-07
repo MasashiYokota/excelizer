@@ -2,10 +2,10 @@
 ### Workbook
 - [x] NewFile
 - [x] OpenFile
-- [ ] Save
+- [x] Save
 - [x] SaveAs
 - [x] NewSheet
-- [ ] DeleteSheet
+- [x] DeleteSheet
 - [ ] CopySheet
 - [ ] SetSheetBackground
 - [x] SetActiveSheet
@@ -103,7 +103,7 @@
 - [ ] AddSparkline
 
 ### Style
-- [x] NewStyle
+- [ ] NewStyle
 - [ ] SetColStyle
 - [ ] SetDefaultFont
 
