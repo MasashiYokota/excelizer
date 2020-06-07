@@ -27,6 +27,18 @@ defmodule Excelizir.Base do
   def new_sheet(file_id, sheet_name)
   def new_sheet(_, _), do: :erlang.nif_error(:not_loaded)
 
+  def set_active_sheet(file_id, sheet_id)
+  def set_active_sheet(_, _), do: :erlang.nif_error(:not_loaded)
+
+  def save_as(file_id, path)
+  def save_as(_, _), do: :erlang.nif_error(:not_loaded)
+
+  def save(file_id)
+  def save(_), do: :erlang.nif_error(:not_loaded)
+
+  def close_file(file_id)
+  def close_file(_), do: :erlang.nif_error(:not_loaded)
+
   def set_cell_value(file_id, sheet_name, column, value_type, value)
   def set_cell_value(_, _, _, _, _), do: :erlang.nif_error(:not_loaded)
 
@@ -35,15 +47,6 @@ defmodule Excelizir.Base do
 
   def set_row(file_id, sheet_name, column, rows)
   def set_row(_, _, _, _), do: :erlang.nif_error(:not_loaded)
-
-  def set_active_sheet(file_id, sheet_id)
-  def set_active_sheet(_, _), do: :erlang.nif_error(:not_loaded)
-
-  def save_as(file_id, path)
-  def save_as(_, _), do: :erlang.nif_error(:not_loaded)
-
-  def close_file(file_id)
-  def close_file(_), do: :erlang.nif_error(:not_loaded)
 
   defp load_nif do
     # path = :filename.join('./go_src/nif_excelizir')
