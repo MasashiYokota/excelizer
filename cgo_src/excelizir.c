@@ -41,6 +41,10 @@ ERL_NIF_TERM copy_sheet(ErlNifEnv *env, int argc, const ERL_NIF_TERM argv[]) {
 	return CopySheet(env, argc, argv);
 }
 
+ERL_NIF_TERM set_sheet_background(ErlNifEnv *env, int argc, const ERL_NIF_TERM argv[]) {
+	return SetSheetBackground(env, argc, argv);
+}
+
 ERL_NIF_TERM close_file(ErlNifEnv *env, int argc, const ERL_NIF_TERM argv[]) {
   return CloseFile(env, argc, argv);
 }
@@ -69,6 +73,7 @@ static ErlNifFunc excelixir_nif_funcs[] = {
   {"save", 1, save},
   {"delete_sheet", 2, delete_sheet},
   {"copy_sheet", 3, copy_sheet},
+  {"set_sheet_background", 3, set_sheet_background},
   {"close_file", 1, close_file},
   {"set_cell_value", 5, set_cell_value},
   {"set_cell_style", 5, set_cell_style},

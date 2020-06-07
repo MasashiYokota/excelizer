@@ -42,6 +42,9 @@ defmodule Excelizir.Base do
   def copy_sheet(file_id, from, to)
   def copy_sheet(_, _, _), do: :erlang.nif_error(:not_loaded)
 
+  def set_sheet_background(file_id, sheet_name, picture_path)
+  def set_sheet_background(_, _, _), do: :erlang.nif_error(:not_loaded)
+
   def close_file(file_id)
   def close_file(_), do: :erlang.nif_error(:not_loaded)
 

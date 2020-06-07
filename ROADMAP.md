@@ -6,8 +6,8 @@
 - [x] SaveAs
 - [x] NewSheet
 - [x] DeleteSheet
-- [ ] CopySheet
-- [ ] SetSheetBackground
+- [x] CopySheet
+- [x] SetSheetBackground
 - [x] SetActiveSheet
 - [ ] GetActiveSheetIndex
 - [ ] SetSheetVisible
