@@ -149,6 +149,29 @@ func DeleteSheet(env *C.ErlNifEnv, argc C.int, argv *C.nif_arg_t) C.ERL_NIF_TERM
 	return C.enif_make_tuple2(env, status, erlFileIdTerm)
 }
 
+//export CopySheet
+func CopySheet(env *C.ErlNifEnv, argc C.int, argv *C.nif_arg_t) C.ERL_NIF_TERM {
+	var erlFileId C.ErlNifBinary;
+	var erlFrom, erlTo C.ErlNifSInt64;
+	erlFileIdTerm := C.get_arg(argv, 0)
+	erlFromTerm := C.get_arg(argv, 1)
+	erlToTerm := C.get_arg(argv, 2)
+	C.enif_inspect_binary(env, erlFileIdTerm, &erlFileId);
+	C.enif_get_int64(env, erlFromTerm, &erlFrom);
+	C.enif_get_int64(env, erlToTerm, &erlTo);
+
+	fileId := convertErlBinaryToGoString(erlFileId)
+	file, ok := fileStore[fileId]
+	if ok == false {
+		return returnErrorStatusWithMessage(env,  "given invalid file id")
+	}
+	if err := file.CopySheet(int(erlFrom), int(erlTo)) ; err != nil {
+		return returnErrorStatusWithMessage(env,  err.Error())
+	}
+	status := convertGoStringToErlAtom(env, "ok")
+	return C.enif_make_tuple2(env, status, erlFileIdTerm)
+}
+
 //export CloseFile
 func CloseFile(env *C.ErlNifEnv, argc C.int, argv *C.nif_arg_t) C.ERL_NIF_TERM {
 	var erlFileId C.ErlNifBinary;

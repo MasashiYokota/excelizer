@@ -39,6 +39,9 @@ defmodule Excelizir.Base do
   def delete_sheet(file_id, sheet_name)
   def delete_sheet(_, _), do: :erlang.nif_error(:not_loaded)
 
+  def copy_sheet(file_id, from, to)
+  def copy_sheet(_, _, _), do: :erlang.nif_error(:not_loaded)
+
   def close_file(file_id)
   def close_file(_), do: :erlang.nif_error(:not_loaded)
 
