@@ -62,7 +62,7 @@ static ErlNifFunc excelixir_nif_funcs[] = {
   {"new_sheet", 2, new_sheet},
   {"set_active_sheet", 2, set_active_sheet},
   {"save_as", 2, save_as},
-  {"save", 0, save},
+  {"save", 1, save},
   {"delete_sheet", 2, delete_sheet},
   {"close_file", 1, close_file},
   {"set_cell_value", 5, set_cell_value},
