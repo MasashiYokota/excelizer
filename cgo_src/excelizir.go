@@ -33,14 +33,8 @@ var fileStore map[string]*excelize.File
 
 //export ReadSheet
 func ReadSheet(env *C.ErlNifEnv, argc C.int, argv *C.nif_arg_t) C.ERL_NIF_TERM {
-	var erlFilename, erlSheetName C.ErlNifBinary;
-	erlFilenameTerm := C.get_arg(argv, 0)
-	erlSheetNameTerm := C.get_arg(argv, 1)
-	C.enif_inspect_binary(env, erlFilenameTerm, &erlFilename);
-	C.enif_inspect_binary(env, erlSheetNameTerm, &erlSheetName);
-
-	filename := convertErlBinaryToGoString(erlFilename)
-	sheetName := convertErlBinaryToGoString(erlSheetName)
+	filename := extractArgAsGoString(env, argv, 0)
+	sheetName := extractArgAsGoString(env, argv, 1)
 	var output []C.ERL_NIF_TERM
 	file, err := excelize.OpenFile(filename)
 	if err != nil {
@@ -65,11 +59,7 @@ func ReadSheet(env *C.ErlNifEnv, argc C.int, argv *C.nif_arg_t) C.ERL_NIF_TERM {
 
 //export OpenFile
 func OpenFile(env *C.ErlNifEnv, argc C.int, argv *C.nif_arg_t) C.ERL_NIF_TERM {
-	var erlFilename C.ErlNifBinary;
-	erlFilenameTerm := C.get_arg(argv, 0)
-	C.enif_inspect_binary(env,erlFilenameTerm, &erlFilename);
-
-	filename := convertErlBinaryToGoString(erlFilename)
+	filename := extractArgAsGoString(env, argv, 0)
 	file, err := excelize.OpenFile(filename)
 	if err != nil {
 		return returnErrorStatusWithMessage(env, err.Error())
@@ -93,14 +83,8 @@ func NewFile(env *C.ErlNifEnv, argc C.int, argv *C.nif_arg_t) C.ERL_NIF_TERM {
 
 //export SaveAs
 func SaveAs(env *C.ErlNifEnv, argc C.int, argv *C.nif_arg_t) C.ERL_NIF_TERM {
-	var erlFileId, erlPath C.ErlNifBinary;
-	erlFileIdTerm := C.get_arg(argv, 0)
-	erlPathTerm := C.get_arg(argv, 1)
-	C.enif_inspect_binary(env, erlFileIdTerm, &erlFileId);
-	C.enif_inspect_binary(env, erlPathTerm, &erlPath);
-
-	fileId := convertErlBinaryToGoString(erlFileId)
-	path := convertErlBinaryToGoString(erlPath)
+	fileId := extractArgAsGoString(env, argv, 0)
+	path := extractArgAsGoString(env, argv, 1)
 	file, ok := fileStore[fileId]
 	if ok == false {
 		return returnErrorStatusWithMessage(env,  "given invalid file id")
@@ -109,16 +93,12 @@ func SaveAs(env *C.ErlNifEnv, argc C.int, argv *C.nif_arg_t) C.ERL_NIF_TERM {
 		return returnErrorStatusWithMessage(env,  err.Error())
 	}
 	status := convertGoStringToErlAtom(env, "ok")
-	return C.enif_make_tuple2(env, status, erlFileIdTerm)
+	return C.enif_make_tuple2(env, status, convertGoStringToErlBinary(env, fileId))
 }
 
 //export Save
 func Save(env *C.ErlNifEnv, argc C.int, argv *C.nif_arg_t) C.ERL_NIF_TERM {
-	var erlFileId C.ErlNifBinary;
-	erlFileIdTerm := C.get_arg(argv, 0)
-	C.enif_inspect_binary(env, erlFileIdTerm, &erlFileId);
-
-	fileId := convertErlBinaryToGoString(erlFileId)
+	fileId := extractArgAsGoString(env, argv, 0)
 	file, ok := fileStore[fileId]
 	if ok == false {
 		return returnErrorStatusWithMessage(env,  "given invalid file id")
@@ -127,64 +107,43 @@ func Save(env *C.ErlNifEnv, argc C.int, argv *C.nif_arg_t) C.ERL_NIF_TERM {
 		return returnErrorStatusWithMessage(env,  err.Error())
 	}
 	status := convertGoStringToErlAtom(env, "ok")
-	return C.enif_make_tuple2(env, status, erlFileIdTerm)
+	return C.enif_make_tuple2(env, status, convertGoStringToErlBinary(env, fileId))
 }
 
 //export DeleteSheet
 func DeleteSheet(env *C.ErlNifEnv, argc C.int, argv *C.nif_arg_t) C.ERL_NIF_TERM {
-	var erlFileId, erlSheetName C.ErlNifBinary;
-	erlFileIdTerm := C.get_arg(argv, 0)
-	erlSheetNameTerm := C.get_arg(argv, 1)
-	C.enif_inspect_binary(env, erlFileIdTerm, &erlFileId);
-	C.enif_inspect_binary(env, erlSheetNameTerm, &erlSheetName);
-
-	fileId := convertErlBinaryToGoString(erlFileId)
-	sheetName:= convertErlBinaryToGoString(erlSheetName)
+	fileId := extractArgAsGoString(env, argv, 0)
+	sheetName := extractArgAsGoString(env, argv, 1)
 	file, ok := fileStore[fileId]
 	if ok == false {
 		return returnErrorStatusWithMessage(env,  "given invalid file id")
 	}
 	file.DeleteSheet(sheetName)
 	status := convertGoStringToErlAtom(env, "ok")
-	return C.enif_make_tuple2(env, status, erlFileIdTerm)
+	return C.enif_make_tuple2(env, status, convertGoStringToErlBinary(env, fileId))
 }
 
 //export CopySheet
 func CopySheet(env *C.ErlNifEnv, argc C.int, argv *C.nif_arg_t) C.ERL_NIF_TERM {
-	var erlFileId C.ErlNifBinary;
-	var erlFrom, erlTo C.ErlNifSInt64;
-	erlFileIdTerm := C.get_arg(argv, 0)
-	erlFromTerm := C.get_arg(argv, 1)
-	erlToTerm := C.get_arg(argv, 2)
-	C.enif_inspect_binary(env, erlFileIdTerm, &erlFileId);
-	C.enif_get_int64(env, erlFromTerm, &erlFrom);
-	C.enif_get_int64(env, erlToTerm, &erlTo);
-
-	fileId := convertErlBinaryToGoString(erlFileId)
+	fileId := extractArgAsGoString(env, argv, 0)
+	from := extractArgAsGoInt(env, argv, 1)
+	to := extractArgAsGoInt(env, argv, 1)
 	file, ok := fileStore[fileId]
 	if ok == false {
 		return returnErrorStatusWithMessage(env,  "given invalid file id")
 	}
-	if err := file.CopySheet(int(erlFrom), int(erlTo)) ; err != nil {
+	if err := file.CopySheet(from, to) ; err != nil {
 		return returnErrorStatusWithMessage(env,  err.Error())
 	}
 	status := convertGoStringToErlAtom(env, "ok")
-	return C.enif_make_tuple2(env, status, erlFileIdTerm)
+	return C.enif_make_tuple2(env, status, convertGoStringToErlBinary(env, fileId))
 }
 
 //export SetSheetBackground
 func SetSheetBackground(env *C.ErlNifEnv, argc C.int, argv *C.nif_arg_t) C.ERL_NIF_TERM {
-	var erlFileId, erlSheetName, erlPicturePath C.ErlNifBinary;
-	erlFileIdTerm := C.get_arg(argv, 0)
-	erlSheetNameTerm := C.get_arg(argv, 1)
-	erlPicturePathTerm := C.get_arg(argv, 2)
-	C.enif_inspect_binary(env, erlFileIdTerm, &erlFileId);
-	C.enif_inspect_binary(env, erlSheetNameTerm, &erlSheetName);
-	C.enif_inspect_binary(env, erlPicturePathTerm, &erlPicturePath);
-
-	fileId := convertErlBinaryToGoString(erlFileId)
-	sheetName:= convertErlBinaryToGoString(erlSheetName)
-	picturePath := convertErlBinaryToGoString(erlPicturePath)
+	fileId := extractArgAsGoString(env, argv, 0)
+	sheetName := extractArgAsGoString(env, argv, 1)
+	picturePath := extractArgAsGoString(env, argv, 2)
 	file, ok := fileStore[fileId]
 	if ok == false {
 		return returnErrorStatusWithMessage(env,  "given invalid file id")
@@ -193,16 +152,12 @@ func SetSheetBackground(env *C.ErlNifEnv, argc C.int, argv *C.nif_arg_t) C.ERL_N
 		return returnErrorStatusWithMessage(env,  err.Error())
 	}
 	status := convertGoStringToErlAtom(env, "ok")
-	return C.enif_make_tuple2(env, status, erlFileIdTerm)
+	return C.enif_make_tuple2(env, status, convertGoStringToErlBinary(env, fileId))
 }
 
 //export GetActiveSheetIndex
 func GetActiveSheetIndex(env *C.ErlNifEnv, argc C.int, argv *C.nif_arg_t) C.ERL_NIF_TERM {
-	var erlFileId C.ErlNifBinary;
-	erlFileIdTerm := C.get_arg(argv, 0)
-	C.enif_inspect_binary(env, erlFileIdTerm, &erlFileId);
-
-	fileId := convertErlBinaryToGoString(erlFileId)
+	fileId := extractArgAsGoString(env, argv, 0)
 	file, ok := fileStore[fileId]
 	if ok == false {
 		return returnErrorStatusWithMessage(env,  "given invalid file id")
@@ -215,17 +170,9 @@ func GetActiveSheetIndex(env *C.ErlNifEnv, argc C.int, argv *C.nif_arg_t) C.ERL_
 
 //export SetActiveSheetVisible
 func SetActiveSheetVisible(env *C.ErlNifEnv, argc C.int, argv *C.nif_arg_t) C.ERL_NIF_TERM {
-	var erlFileId, erlSheetName, erlValue C.ErlNifBinary;
-	erlFileIdTerm := C.get_arg(argv, 0)
-	erlSheetNameTerm := C.get_arg(argv, 1)
-	erlValueTerm := C.get_arg(argv, 2)
-	C.enif_inspect_binary(env, erlFileIdTerm, &erlFileId);
-	C.enif_inspect_binary(env, erlSheetNameTerm, &erlSheetName);
-	C.enif_inspect_binary(env, erlValueTerm, &erlValue);
-
-	fileId := convertErlBinaryToGoString(erlFileId)
-	sheetName := convertErlBinaryToGoString(erlSheetName)
-	value := convertErlBinaryToGoString(erlValue)
+	fileId := extractArgAsGoString(env, argv, 0)
+	sheetName := extractArgAsGoString(env, argv, 1)
+	value := extractArgAsGoString(env, argv, 2)
 	file, ok := fileStore[fileId]
 	if ok == false {
 		return returnErrorStatusWithMessage(env,  "given invalid file id")
@@ -242,15 +189,12 @@ func SetActiveSheetVisible(env *C.ErlNifEnv, argc C.int, argv *C.nif_arg_t) C.ER
 		return returnErrorStatusWithMessage(env, err.Error())
 	}
 	status := convertGoStringToErlAtom(env, "ok")
-	return C.enif_make_tuple2(env, status, erlFileIdTerm)
+	return C.enif_make_tuple2(env, status, convertGoStringToErlBinary(env, fileId))
 }
 
 //export CloseFile
 func CloseFile(env *C.ErlNifEnv, argc C.int, argv *C.nif_arg_t) C.ERL_NIF_TERM {
-	var erlFileId C.ErlNifBinary;
-	erlFileIdTerm := C.get_arg(argv, 0)
-	C.enif_inspect_binary(env, erlFileIdTerm, &erlFileId);
-	fileId := convertErlBinaryToGoString(erlFileId)
+	fileId := extractArgAsGoString(env, argv, 0)
 	err := releaseFilePtr(fileId)
 	if err != nil {
 		return convertGoStringToErlAtom(env, "error")
@@ -262,14 +206,8 @@ func CloseFile(env *C.ErlNifEnv, argc C.int, argv *C.nif_arg_t) C.ERL_NIF_TERM {
 
 //export NewSheet
 func NewSheet(env *C.ErlNifEnv, argc C.int, argv *C.nif_arg_t) C.ERL_NIF_TERM {
-	var erlFileId, erlSheetName C.ErlNifBinary;
-	erlFileIdTerm := C.get_arg(argv, 0)
-	erlSheetNameTerm := C.get_arg(argv, 1)
-	C.enif_inspect_binary(env, erlFileIdTerm, &erlFileId);
-	C.enif_inspect_binary(env, erlSheetNameTerm, &erlSheetName);
-
-	sheetName := convertErlBinaryToGoString(erlSheetName)
-	fileId := convertErlBinaryToGoString(erlFileId)
+	fileId := extractArgAsGoString(env, argv, 0)
+	sheetName := extractArgAsGoString(env, argv, 1)
 	file, ok := fileStore[fileId]
 	if ok == false {
 		return returnErrorStatusWithMessage(env, "given invalid file id")
@@ -283,43 +221,26 @@ func NewSheet(env *C.ErlNifEnv, argc C.int, argv *C.nif_arg_t) C.ERL_NIF_TERM {
 
 //export SetActiveSheet
 func SetActiveSheet(env *C.ErlNifEnv, argc C.int, argv *C.nif_arg_t) C.ERL_NIF_TERM {
-	var erlFileId C.ErlNifBinary;
-	var erlSheetId C.ErlNifSInt64;
-	erlFileIdTerm := C.get_arg(argv, 0)
-	erlSheetIdTerm := C.get_arg(argv, 1)
-	C.enif_inspect_binary(env, erlFileIdTerm, &erlFileId);
-	C.enif_get_int64(env, erlSheetIdTerm, &erlSheetId);
-
-	fileId := convertErlBinaryToGoString(erlFileId)
-	sheetId := int(erlSheetId)
+	fileId := extractArgAsGoString(env, argv, 0)
+	sheetId := extractArgAsGoInt(env, argv, 1)
 	file, ok := fileStore[fileId]
 	if ok == false {
 		return returnErrorStatusWithMessage(env, "given invalid file id")
 	}
 	file.SetActiveSheet(sheetId)
 	status := convertGoStringToErlAtom(env, "ok")
-	return C.enif_make_tuple2(env, status, erlFileIdTerm)
+	return C.enif_make_tuple2(env, status, convertGoStringToErlBinary(env, fileId))
 }
 
 // --------------------------- Cell ---------------------------
 
 //export SetCellValue
 func SetCellValue(env *C.ErlNifEnv, argc C.int, argv *C.nif_arg_t) C.ERL_NIF_TERM {
-	var erlFileId, erlSheetName, erlColumn, erlValueType C.ErlNifBinary;
-	erlFileIdTerm := C.get_arg(argv, 0)
-	erlSheetNameTerm := C.get_arg(argv, 1)
-	erlColumnTerm := C.get_arg(argv, 2)
-	erlValueTypeTerm := C.get_arg(argv, 3)
+	fileId := extractArgAsGoString(env, argv, 0)
+	sheetName := extractArgAsGoString(env, argv, 1)
+	column := extractArgAsGoString(env, argv, 2)
+	valueType := extractArgAsGoString(env, argv, 3)
 	erlValueTerm := C.get_arg(argv, 4)
-	C.enif_inspect_binary(env, erlFileIdTerm, &erlFileId);
-	C.enif_inspect_binary(env, erlSheetNameTerm, &erlSheetName);
-	C.enif_inspect_binary(env, erlColumnTerm, &erlColumn);
-	C.enif_inspect_binary(env, erlValueTypeTerm, &erlValueType);
-
-	fileId := convertErlBinaryToGoString(erlFileId)
-	sheetName := convertErlBinaryToGoString(erlSheetName)
-	column := convertErlBinaryToGoString(erlColumn)
-	valueType := convertErlBinaryToGoString(erlValueType)
 	file, ok := fileStore[fileId]
 	if ok == false {
 		return returnErrorStatusWithMessage(env, "given invalid file id")
@@ -331,27 +252,16 @@ func SetCellValue(env *C.ErlNifEnv, argc C.int, argv *C.nif_arg_t) C.ERL_NIF_TER
 	}
 	file.SetCellValue(sheetName, column, value)
 	status := convertGoStringToErlAtom(env, "ok")
-	return C.enif_make_tuple2(env, status, erlFileIdTerm)
+	return C.enif_make_tuple2(env, status, convertGoStringToErlBinary(env, fileId))
 }
 
 //export SetCellStyle
 func SetCellStyle(env *C.ErlNifEnv, argc C.int, argv *C.nif_arg_t) C.ERL_NIF_TERM {
-	var erlFileId, erlSheetName, erlVCell, erlHCell, erlStyle C.ErlNifBinary;
-	erlFileIdTerm := C.get_arg(argv, 0)
-	erlSheetNameTerm := C.get_arg(argv, 1)
-	erlHCellTerm := C.get_arg(argv, 2)
-	erlVCellTerm := C.get_arg(argv, 3)
-	erlStyleTerm := C.get_arg(argv, 4)
-	C.enif_inspect_binary(env, erlFileIdTerm, &erlFileId);
-	C.enif_inspect_binary(env, erlSheetNameTerm, &erlSheetName);
-	C.enif_inspect_binary(env, erlVCellTerm, &erlVCell);
-	C.enif_inspect_binary(env, erlHCellTerm, &erlHCell);
-	C.enif_inspect_binary(env, erlStyleTerm, &erlStyle);
-	fileId := convertErlBinaryToGoString(erlFileId)
-	sheetName := convertErlBinaryToGoString(erlSheetName)
-	vcell := convertErlBinaryToGoString(erlVCell)
-	hcell := convertErlBinaryToGoString(erlHCell)
-	style := convertErlBinaryToGoString(erlStyle)
+	fileId := extractArgAsGoString(env, argv, 0)
+	sheetName := extractArgAsGoString(env, argv, 1)
+	vcell := extractArgAsGoString(env, argv, 2)
+	hcell := extractArgAsGoString(env, argv, 3)
+	style := extractArgAsGoString(env, argv, 4)
 	file, ok := fileStore[fileId]
 	if ok == false {
 		return returnErrorStatusWithMessage(env, "given invalid file id")
@@ -362,25 +272,17 @@ func SetCellStyle(env *C.ErlNifEnv, argc C.int, argv *C.nif_arg_t) C.ERL_NIF_TER
 	}
 	file.SetCellStyle(sheetName, hcell, vcell, styleId)
 	status := convertGoStringToErlAtom(env, "ok")
-	return C.enif_make_tuple2(env, status, erlFileIdTerm)
+	return C.enif_make_tuple2(env, status, convertGoStringToErlBinary(env, fileId))
 }
 
 // --------------------------- StreamWrite ---------------------------
 
 //export SetRow
 func SetRow(env *C.ErlNifEnv, argc C.int, argv *C.nif_arg_t) C.ERL_NIF_TERM {
-	var erlFileId, erlSheetName, erlColumn C.ErlNifBinary;
-	erlFileIdTerm := C.get_arg(argv, 0)
-	erlSheetNameTerm := C.get_arg(argv, 1)
-	erlColumnTerm := C.get_arg(argv, 2)
 	erlRowsTerm := C.get_arg(argv, 3)
-	C.enif_inspect_binary(env, erlFileIdTerm, &erlFileId);
-	C.enif_inspect_binary(env, erlSheetNameTerm, &erlSheetName);
-	C.enif_inspect_binary(env, erlColumnTerm, &erlColumn);
-
-	fileId := convertErlBinaryToGoString(erlFileId)
-	sheetName := convertErlBinaryToGoString(erlSheetName)
-	column := convertErlBinaryToGoString(erlColumn)
+	fileId := extractArgAsGoString(env, argv, 0)
+	sheetName := extractArgAsGoString(env, argv, 1)
+	column := extractArgAsGoString(env, argv, 2)
 	file, ok := fileStore[fileId]
 	if ok == false {
 		return returnErrorStatusWithMessage(env, "given invalid file id")
@@ -430,7 +332,7 @@ func SetRow(env *C.ErlNifEnv, argc C.int, argv *C.nif_arg_t) C.ERL_NIF_TERM {
 		return returnErrorStatusWithMessage(env, err.Error())
 	}
 	status := convertGoStringToErlAtom(env, "ok")
-	return C.enif_make_tuple2(env, status, erlFileIdTerm)
+	return C.enif_make_tuple2(env, status, convertGoStringToErlBinary(env, fileId))
 }
 
 // --------------------------- PrivFunction ---------------------------
@@ -540,6 +442,20 @@ func returnErrorStatusWithMessage(env *C.ErlNifEnv, message string) C.ERL_NIF_TE
 	status := convertGoStringToErlAtom(env, "error")
 	messageBinary := convertGoStringToErlBinary(env, message)
 	return C.enif_make_tuple2(env, status, messageBinary)
+}
+
+func extractArgAsGoString(env *C.ErlNifEnv, argv *C.nif_arg_t, argIndex int) string {
+	var erlValue C.ErlNifBinary;
+	erlValueTerm := C.get_arg(argv, C.int(argIndex))
+	C.enif_inspect_binary(env, erlValueTerm, &erlValue);
+	return convertErlBinaryToGoString(erlValue)
+}
+
+func extractArgAsGoInt(env *C.ErlNifEnv, argv *C.nif_arg_t, argIndex int) int {
+	var erlValue C.ErlNifSInt64;
+	erlValueTerm := C.get_arg(argv, C.int(argIndex))
+	C.enif_get_int64(env, erlValueTerm, &erlValue);
+	return int(erlValue)
 }
 
 func main() {}
