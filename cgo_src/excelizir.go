@@ -213,6 +213,38 @@ func GetActiveSheetIndex(env *C.ErlNifEnv, argc C.int, argv *C.nif_arg_t) C.ERL_
 	return C.enif_make_tuple2(env, status, erlActiveSheetIndexTerm)
 }
 
+//export SetActiveSheetVisible
+func SetActiveSheetVisible(env *C.ErlNifEnv, argc C.int, argv *C.nif_arg_t) C.ERL_NIF_TERM {
+	var erlFileId, erlSheetName, erlValue C.ErlNifBinary;
+	erlFileIdTerm := C.get_arg(argv, 0)
+	erlSheetNameTerm := C.get_arg(argv, 1)
+	erlValueTerm := C.get_arg(argv, 2)
+	C.enif_inspect_binary(env, erlFileIdTerm, &erlFileId);
+	C.enif_inspect_binary(env, erlSheetNameTerm, &erlSheetName);
+	C.enif_inspect_binary(env, erlValueTerm, &erlValue);
+
+	fileId := convertErlBinaryToGoString(erlFileId)
+	sheetName := convertErlBinaryToGoString(erlSheetName)
+	value := convertErlBinaryToGoString(erlValue)
+	file, ok := fileStore[fileId]
+	if ok == false {
+		return returnErrorStatusWithMessage(env,  "given invalid file id")
+	}
+	boolValue := true
+	if value == "true" {
+		boolValue = true
+	} else if value == "false" {
+		boolValue = false
+	} else {
+		return returnErrorStatusWithMessage(env,  "given invalid value")
+	}
+	if err := file.SetSheetVisible(sheetName, boolValue); err != nil {
+		return returnErrorStatusWithMessage(env, err.Error())
+	}
+	status := convertGoStringToErlAtom(env, "ok")
+	return C.enif_make_tuple2(env, status, erlFileIdTerm)
+}
+
 //export CloseFile
 func CloseFile(env *C.ErlNifEnv, argc C.int, argv *C.nif_arg_t) C.ERL_NIF_TERM {
 	var erlFileId C.ErlNifBinary;

@@ -10,7 +10,7 @@
 - [x] SetSheetBackground
 - [x] SetActiveSheet
 - [x] GetActiveSheetIndex
-- [ ] SetSheetVisible
+- [x] SetSheetVisible
 - [ ] GetSheetVisible
 - [ ] SetSheetFormatPr
 - [ ] GetSheetFormatPr
