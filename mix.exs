@@ -30,7 +30,8 @@ defmodule Excelizer.MixProject do
   # Run "mix help deps" to learn about dependencies.
   defp deps do
     [
-      {:elixir_make, "~> 0.4", runtime: false}
+      {:elixir_make, "~> 0.4", runtime: false},
+      {:dialyxir, "~> 1.0", only: [:dev], runtime: false}
     ]
   end
 end

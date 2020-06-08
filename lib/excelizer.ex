@@ -8,7 +8,7 @@ defmodule Excelizer do
   alias Excelizer.Native.Base
   alias Excelizer.Workbook
 
-  @spec open(String.t(), function) :: :ok
+  @spec open(String.t(), function) :: :ok | :error
   def open(filename, func) do
     if File.exists?(filename) do
       do_open(filename, func)
@@ -20,25 +20,21 @@ defmodule Excelizer do
   defp do_open(filename, func) do
     with {:ok, file_id} <- Base.open_file(filename),
          {:ok, file_id} <- func.(file_id),
-         {:ok, file_id} <- Workbook.save(file_id),
-         :ok <- Workbook.close_file(file_id) do
-      :ok
+         {:ok, file_id} <- Workbook.save(file_id) do
+      Workbook.close_file(file_id)
     else
       {:error, err_msg} -> raise Excelizer.Exception, message: err_msg
-      :error -> raise Excelizer.Exception, message: "failed to close file"
     end
   end
 
-  @spec new(String.t(), function) :: :ok
+  @spec new(String.t(), function) :: :ok | :error
   def new(filename, func) do
     with {:ok, file_id} <- Base.new_file(),
          {:ok, file_id} <- func.(file_id),
-         {:ok, file_id} <- Workbook.save_as(file_id, filename),
-         :ok <- Workbook.close_file(file_id) do
-      :ok
+         {:ok, file_id} <- Workbook.save_as(file_id, filename) do
+      Workbook.close_file(file_id)
     else
       {:error, err_msg} -> raise Excelizer.Exception, message: err_msg
-      :error -> raise Excelizer.Exception, message: "failed to close file"
     end
   end
 end
