@@ -7,7 +7,7 @@ defmodule ExcelizerTest do
     {:ok, file} = Base.new_file()
     {:ok, _file} = Base.new_sheet(file, "hoge")
     {:ok, file} = Base.set_cell_value(file, "hoge", "A1", "string", "test")
-    {:ok, file} = Base.save_as(file, "test.xlsx")
+    {:ok, file} = Base.save_as(file, "tmp/test.xlsx")
     Base.close_file(file)
   end
 end

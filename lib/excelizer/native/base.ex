@@ -2,12 +2,15 @@ defmodule Excelizer.Native.Base do
   @compile {:autoload, false}
   @on_load {:init, 0}
 
+  @type file_id :: String.t()
+  @type nif_resp(type) :: {:ok, type} | {:error, String.t()}
+
   def init do
     case load_nif() do
       :ok ->
         :ok
 
-      e ->
+      _ ->
         raise """
         An error occurred when loading Excelizer Go library.
         Make sure your environemnt (e.g. C compiler, Erlang version, Elixir version).
@@ -18,9 +21,11 @@ defmodule Excelizer.Native.Base do
   def read_sheet(filename, sheetname)
   def read_sheet(_, _), do: :erlang.nif_error(:not_loaded)
 
+  @spec open_file(String.t()) :: nif_resp(file_id())
   def open_file(filename)
   def open_file(_), do: :erlang.nif_error(:not_loaded)
 
+  @spec new_file :: nif_resp(file_id())
   def new_file
   def new_file, do: :erlang.nif_error(:not_loaded)
 
