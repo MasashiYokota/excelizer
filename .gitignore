@@ -29,3 +29,5 @@ cgo_src/libgo_excelizer.a
 cgo_src/libgo_excelizer.h
 cgo_src/excelizer_nif.so
 cgo_src/_obj
+
+tmp/

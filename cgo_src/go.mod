@@ -1,4 +1,4 @@
-module MasashiYokota/excelizir
+module MasashiYokota/excelizer
 
 go 1.12
 

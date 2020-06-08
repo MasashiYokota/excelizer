@@ -1,2 +1,0 @@
-defmodule Excelizir do
-end
