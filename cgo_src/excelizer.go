@@ -127,7 +127,7 @@ func DeleteSheet(env *C.ErlNifEnv, argc C.int, argv *C.nif_arg_t) C.ERL_NIF_TERM
 func CopySheet(env *C.ErlNifEnv, argc C.int, argv *C.nif_arg_t) C.ERL_NIF_TERM {
 	fileId := extractArgAsGoString(env, argv, 0)
 	from := extractArgAsGoInt(env, argv, 1)
-	to := extractArgAsGoInt(env, argv, 1)
+	to := extractArgAsGoInt(env, argv, 2)
 	file, ok := fileStore[fileId]
 	if ok == false {
 		return returnErrorStatusWithMessage(env,  "given invalid file id")
