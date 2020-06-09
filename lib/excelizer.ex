@@ -8,6 +8,17 @@ defmodule Excelizer do
   alias Excelizer.Native.Base
   alias Excelizer.Workbook
 
+  @spec read_sheet(String.t(), String.t()) :: Base.nif_resp(Base.file_id())
+  def read_sheet(filename, sheetname), do: Base.read_sheet(filename, sheetname)
+
+  @spec read_sheet!(String.t(), String.t()) :: Base.file_id()
+  def read_sheet!(filename, sheetname) do
+    case Base.read_sheet(filename, sheetname) do
+      {:ok, resp} -> resp
+      {:error, err_msg} -> raise Excelizer.Exception, message: err_msg
+    end
+  end
+
   @spec open(String.t(), function) :: :ok | :error
   def open(filename, func) do
     if File.exists?(filename) do
@@ -21,7 +32,7 @@ defmodule Excelizer do
     with {:ok, file_id} <- Base.open_file(filename),
          {:ok, file_id} <- func.(file_id),
          {:ok, file_id} <- Workbook.save(file_id) do
-      Workbook.close_file(file_id)
+      Base.close_file(file_id)
     else
       {:error, err_msg} -> raise Excelizer.Exception, message: err_msg
     end
@@ -32,7 +43,7 @@ defmodule Excelizer do
     with {:ok, file_id} <- Base.new_file(),
          {:ok, file_id} <- func.(file_id),
          {:ok, file_id} <- Workbook.save_as(file_id, filename) do
-      Workbook.close_file(file_id)
+      Base.close_file(file_id)
     else
       {:error, err_msg} -> raise Excelizer.Exception, message: err_msg
     end
