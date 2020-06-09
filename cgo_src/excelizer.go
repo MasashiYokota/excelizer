@@ -392,7 +392,7 @@ func convertErlNumberToGoFloat64(env *C.ErlNifEnv, erlValue C.ERL_NIF_TERM) (flo
 // ref: https://stackoverflow.com/questions/59827026/cgo-convert-go-string-to-c-uchar
 func convertErlBinaryToGoString(term C.ErlNifBinary) string {
 	c := (*C.char)(unsafe.Pointer(term.data))
-	return C.GoString(c)
+	return C.GoStringN(c, C.int(term.size))
 }
 
 func convertErlTermToColumnValue(env *C.ErlNifEnv, erlValueTerm C.ERL_NIF_TERM, valueType string) (interface{}, error) {
