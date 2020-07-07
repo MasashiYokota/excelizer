@@ -4,28 +4,6 @@ defmodule Excelizer.Workbook do
   """
   alias Excelizer.Native.Base
 
-  @spec save(Base.file_id()) :: Base.nif_resp(Base.file_id())
-  def save(file_id), do: Base.save(file_id)
-
-  @spec save!(Base.file_id()) :: Base.file_id()
-  def save!(file_id) do
-    case Base.save(file_id) do
-      {:ok, resp} -> resp
-      {:error, err_msg} -> raise Excelizer.Exception, message: err_msg
-    end
-  end
-
-  @spec save_as(Base.file_id(), String.t()) :: Base.nif_resp(Base.file_id())
-  def save_as(file_id, filename), do: Base.save_as(file_id, filename)
-
-  @spec save_as!(Base.file_id(), String.t()) :: Base.file_id()
-  def save_as!(file_id, filename) do
-    case Base.save_as(file_id, filename) do
-      {:ok, resp} -> resp
-      {:error, err_msg} -> raise Excelizer.Exception, message: err_msg
-    end
-  end
-
   @spec new_sheet(Base.file_id(), String.t()) :: Base.nif_resp(pos_integer)
   def new_sheet(file_id, sheet_name), do: Base.new_sheet(file_id, sheet_name)
 

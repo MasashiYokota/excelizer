@@ -204,6 +204,26 @@ func CloseFile(env *C.ErlNifEnv, argc C.int, argv *C.nif_arg_t) C.ERL_NIF_TERM {
 
 // --------------------------- Worksheet ---------------------------
 
+//export SetColWidth
+func SetColWidth(env *C.ErlNifEnv, argc C.int, argv *C.nif_arg_t) C.ERL_NIF_TERM {
+	fileId := extractArgAsGoString(env, argv, 0)
+	sheetName := extractArgAsGoString(env, argv, 1)
+	startCol := extractArgAsGoString(env, argv, 2)
+	endCol := extractArgAsGoString(env, argv, 3)
+	width := extractArgAsGoFloat64(env, argv, 4)
+
+	file, ok := fileStore[fileId]
+	if ok == false {
+		return returnErrorStatusWithMessage(env, "given invalid file id")
+	}
+	err := file.SetColWidth(sheetName, startCol, endCol, width)
+	if err != nil {
+		return returnErrorStatusWithMessage(env, err.Error())
+	}
+	status := convertGoStringToErlAtom(env, "ok")
+	return C.enif_make_tuple2(env, status, convertGoStringToErlBinary(env, fileId))
+}
+
 //export NewSheet
 func NewSheet(env *C.ErlNifEnv, argc C.int, argv *C.nif_arg_t) C.ERL_NIF_TERM {
 	fileId := extractArgAsGoString(env, argv, 0)
@@ -456,6 +476,13 @@ func extractArgAsGoInt(env *C.ErlNifEnv, argv *C.nif_arg_t, argIndex int) int {
 	erlValueTerm := C.get_arg(argv, C.int(argIndex))
 	C.enif_get_int64(env, erlValueTerm, &erlValue);
 	return int(erlValue)
+}
+
+func extractArgAsGoFloat64(env *C.ErlNifEnv, argv *C.nif_arg_t, argIndex int) float64 {
+	var erlValue C.ErlNifSInt64;
+	erlValueTerm := C.get_arg(argv, C.int(argIndex))
+	C.enif_get_long(env, erlValueTerm, &erlValue);
+	return float64(erlValue)
 }
 
 func main() {}

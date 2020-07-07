@@ -29,6 +29,11 @@ defmodule Excelizer.Native.Base do
   def new_file
   def new_file, do: :erlang.nif_error(:not_loaded)
 
+  @spec set_col_width(file_id(), String.t(), String.t(), String.t(), number) ::
+          nif_resp(file_id())
+  def set_col_width(file_id, sheet_name, start_col, end_col, width)
+  def set_col_width(_, _, _, _, _), do: :erlang.nif_error(:not_loaded)
+
   def new_sheet(file_id, sheet_name)
   def new_sheet(_, _), do: :erlang.nif_error(:not_loaded)
 

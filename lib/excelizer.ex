@@ -6,7 +6,6 @@ defmodule Excelizer do
     we shouldn't recommend to use `Excelizer.Native.Base` module directly as possible as you can.
   """
   alias Excelizer.Native.Base
-  alias Excelizer.Workbook
 
   @spec read_sheet(String.t(), String.t()) :: Base.nif_resp(Base.file_id())
   def read_sheet(filename, sheetname), do: Base.read_sheet(filename, sheetname)
@@ -31,7 +30,7 @@ defmodule Excelizer do
   defp do_open(filename, func) do
     with {:ok, file_id} <- Base.open_file(filename),
          {:ok, file_id} <- func.(file_id),
-         {:ok, file_id} <- Workbook.save(file_id) do
+         {:ok, file_id} <- Base.save(file_id) do
       Base.close_file(file_id)
     else
       {:error, err_msg} -> raise Excelizer.Exception, message: err_msg
@@ -42,7 +41,7 @@ defmodule Excelizer do
   def new(filename, func) do
     with {:ok, file_id} <- Base.new_file(),
          {:ok, file_id} <- func.(file_id),
-         {:ok, file_id} <- Workbook.save_as(file_id, filename) do
+         {:ok, file_id} <- Base.save_as(file_id, filename) do
       Base.close_file(file_id)
     else
       {:error, err_msg} -> raise Excelizer.Exception, message: err_msg

@@ -17,14 +17,6 @@ ERL_NIF_TERM new_file(ErlNifEnv *env, int argc, const ERL_NIF_TERM argv[]) {
   return NewFile(env, argc, argv);
 }
 
-ERL_NIF_TERM new_sheet(ErlNifEnv *env, int argc, const ERL_NIF_TERM argv[]) {
-  return NewSheet(env, argc, argv);
-}
-
-ERL_NIF_TERM set_active_sheet(ErlNifEnv *env, int argc, const ERL_NIF_TERM argv[]) {
-  return SetActiveSheet(env, argc, argv);
-}
-
 ERL_NIF_TERM save_as(ErlNifEnv *env, int argc, const ERL_NIF_TERM argv[]) {
   return enif_schedule_nif(env, "SaveAs", ERL_NIF_DIRTY_JOB_IO_BOUND, SaveAs, argc, argv);
 }
@@ -57,6 +49,19 @@ ERL_NIF_TERM close_file(ErlNifEnv *env, int argc, const ERL_NIF_TERM argv[]) {
   return CloseFile(env, argc, argv);
 }
 
+// --------------------------- Worksheet ---------------------------
+ERL_NIF_TERM set_col_width(ErlNifEnv *env, int argc, const ERL_NIF_TERM argv[]) {
+  return SetColWidth(env, argc, argv);
+}
+
+ERL_NIF_TERM new_sheet(ErlNifEnv *env, int argc, const ERL_NIF_TERM argv[]) {
+  return NewSheet(env, argc, argv);
+}
+
+ERL_NIF_TERM set_active_sheet(ErlNifEnv *env, int argc, const ERL_NIF_TERM argv[]) {
+  return SetActiveSheet(env, argc, argv);
+}
+
 // --------------------------- Cell ---------------------------
 ERL_NIF_TERM set_cell_value(ErlNifEnv *env, int argc, const ERL_NIF_TERM argv[]) {
   return SetCellValue(env, argc, argv);
@@ -76,6 +81,7 @@ static ErlNifFunc excelixir_nif_funcs[] = {
   {"open_file", 1, open_file},
   {"new_file", 0, new_file},
   {"new_sheet", 2, new_sheet},
+  {"set_col_width", 5, set_col_width},
   {"set_active_sheet", 2, set_active_sheet},
   {"save_as", 2, save_as},
   {"save", 1, save},
