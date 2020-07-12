@@ -18,4 +18,19 @@ defmodule Excelizer.Worksheet do
       {:error, err_msg} -> raise Excelizer.Exception, message: err_msg
     end
   end
+
+  @spec set_row_height(Base.file_id(), String.t(), pos_integer(), number) ::
+          Base.nif_resp(Base.file_id())
+  def set_row_height(file_id, sheet_name, row, height) do
+    Base.set_row_height(file_id, sheet_name, row, height)
+  end
+
+  @spec set_row_height!(Base.file_id(), String.t(), pos_integer(), number) ::
+          Base.file_id()
+  def set_row_height!(file_id, sheet_name, row, height) do
+    case Base.set_row_height(file_id, sheet_name, row, height) do
+      {:ok, file_id} -> file_id
+      {:error, err_msg} -> raise Excelizer.Exception, message: err_msg
+    end
+  end
 end

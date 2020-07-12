@@ -30,7 +30,7 @@
 ### Worksheet
 - [ ] SetColVisible
 - [x] SetColWidth
-- [ ] SetRowHeight
+- [x] SetRowHeight
 - [ ] SetRowVisible
 - [ ] GetSheetName
 - [ ] GetColVisible

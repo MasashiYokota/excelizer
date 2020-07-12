@@ -54,6 +54,10 @@ ERL_NIF_TERM set_col_width(ErlNifEnv *env, int argc, const ERL_NIF_TERM argv[]) 
   return SetColWidth(env, argc, argv);
 }
 
+ERL_NIF_TERM set_row_height(ErlNifEnv *env, int argc, const ERL_NIF_TERM argv[]) {
+  return SetRowHeight(env, argc, argv);
+}
+
 ERL_NIF_TERM new_sheet(ErlNifEnv *env, int argc, const ERL_NIF_TERM argv[]) {
   return NewSheet(env, argc, argv);
 }
@@ -82,6 +86,7 @@ static ErlNifFunc excelixir_nif_funcs[] = {
   {"new_file", 0, new_file},
   {"new_sheet", 2, new_sheet},
   {"set_col_width", 5, set_col_width},
+  {"set_row_height", 4, set_row_height},
   {"set_active_sheet", 2, set_active_sheet},
   {"save_as", 2, save_as},
   {"save", 1, save},

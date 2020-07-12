@@ -47,4 +47,39 @@ defmodule Excelizer.WorksheetTest do
       end
     end
   end
+
+  describe "set_row_height/5" do
+    test "sets width col width", %{file_id: file_id} do
+      {status, resp} = Worksheet.set_row_height(file_id, "Sheet1", 1, 100)
+      assert status == :ok
+      assert resp == file_id
+    end
+
+    test "fails to set col width", %{file_id: file_id} do
+      {status, resp} = Worksheet.set_row_height("invalid ", "Sheet1", 1, 100)
+      assert status == :error
+      assert resp == "given invalid file id"
+
+      {status, resp} = Worksheet.set_row_height(file_id, "Sheet1", "A", 100)
+      assert status == :error
+      assert resp == "invalid row number 0"
+    end
+  end
+
+  describe "set_row_height!/5" do
+    test "sets width col width", %{file_id: file_id} do
+      resp = Worksheet.set_row_height!(file_id, "Sheet1", 1, 100)
+      assert resp == file_id
+    end
+
+    test "fails to set col width", %{file_id: file_id} do
+      assert_raise Excelizer.Exception, "given invalid file id", fn ->
+        Worksheet.set_row_height!("invalid ", "Sheet1", 1, 100)
+      end
+
+      assert_raise Excelizer.Exception, "invalid row number 0", fn ->
+        Worksheet.set_row_height!(file_id, "Sheet1", "A", 100)
+      end
+    end
+  end
 end
