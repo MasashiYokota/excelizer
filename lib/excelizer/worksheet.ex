@@ -48,4 +48,19 @@ defmodule Excelizer.Worksheet do
       {:error, err_msg} -> raise Excelizer.Exception, message: err_msg
     end
   end
+
+  @spec set_row_visible(Base.file_id(), String.t(), pos_integer(), boolean) ::
+          Base.nif_resp(Base.file_id())
+  def set_row_visible(file_id, sheet_name, row, visible) do
+    Base.set_row_visible(file_id, sheet_name, row, "#{visible}")
+  end
+
+  @spec set_row_visible!(Base.file_id(), String.t(), pos_integer(), boolean) ::
+          Base.file_id()
+  def set_row_visible!(file_id, sheet_name, row, visible) do
+    case Base.set_row_visible(file_id, sheet_name, row, "#{visible}") do
+      {:ok, file_id} -> file_id
+      {:error, err_msg} -> raise Excelizer.Exception, message: err_msg
+    end
+  end
 end

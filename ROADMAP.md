@@ -31,7 +31,7 @@
 - [x] SetColVisible
 - [x] SetColWidth
 - [x] SetRowHeight
-- [ ] SetRowVisible
+- [x] SetRowVisible
 - [ ] GetSheetName
 - [ ] GetColVisible
 - [ ] GetColWidth

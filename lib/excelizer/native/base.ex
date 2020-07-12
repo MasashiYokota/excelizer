@@ -46,6 +46,11 @@ defmodule Excelizer.Native.Base do
   def set_col_visible(file_id, sheet_name, col, boolean)
   def set_col_visible(_, _, _, _), do: :erlang.nif_error(:not_loaded)
 
+  @spec set_row_visible(file_id(), String.t(), pos_integer(), String.t()) ::
+          nif_resp(file_id())
+  def set_row_visible(file_id, sheet_name, row, boolean)
+  def set_row_visible(_, _, _, _), do: :erlang.nif_error(:not_loaded)
+
   def new_sheet(file_id, sheet_name)
   def new_sheet(_, _), do: :erlang.nif_error(:not_loaded)
 
