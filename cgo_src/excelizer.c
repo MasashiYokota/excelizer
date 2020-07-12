@@ -26,23 +26,23 @@ ERL_NIF_TERM save(ErlNifEnv *env, int argc, const ERL_NIF_TERM argv[]) {
 }
 
 ERL_NIF_TERM delete_sheet(ErlNifEnv *env, int argc, const ERL_NIF_TERM argv[]) {
-	return DeleteSheet(env, argc, argv);
+  return DeleteSheet(env, argc, argv);
 }
 
 ERL_NIF_TERM copy_sheet(ErlNifEnv *env, int argc, const ERL_NIF_TERM argv[]) {
-	return CopySheet(env, argc, argv);
+  return CopySheet(env, argc, argv);
 }
 
 ERL_NIF_TERM set_sheet_background(ErlNifEnv *env, int argc, const ERL_NIF_TERM argv[]) {
-	return SetSheetBackground(env, argc, argv);
+  return SetSheetBackground(env, argc, argv);
 }
 
 ERL_NIF_TERM get_active_sheet_index(ErlNifEnv *env, int argc, const ERL_NIF_TERM argv[]) {
-	return GetActiveSheetIndex(env, argc, argv);
+  return GetActiveSheetIndex(env, argc, argv);
 }
 
 ERL_NIF_TERM set_active_sheet_visible(ErlNifEnv *env, int argc, const ERL_NIF_TERM argv[]) {
-	return SetActiveSheetVisible(env, argc, argv);
+  return SetActiveSheetVisible(env, argc, argv);
 }
 
 ERL_NIF_TERM close_file(ErlNifEnv *env, int argc, const ERL_NIF_TERM argv[]) {
