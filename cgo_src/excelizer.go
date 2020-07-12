@@ -18,6 +18,7 @@ static ERL_NIF_TERM get_arg(ERL_NIF_TERM* arg, int index) {
 import "C"
 import (
 	"errors"
+	"sync"
 	"time"
 	"unsafe"
 
@@ -27,7 +28,12 @@ import (
 
 type cstring *C.char
 
-var fileStore map[string]*excelize.File
+type ExcelizerFile struct {
+   sync.Mutex
+   data *excelize.File
+}
+
+var fileStore map[string]ExcelizerFile
 
 // --------------------------- Workbook ---------------------------
 
@@ -89,7 +95,9 @@ func SaveAs(env *C.ErlNifEnv, argc C.int, argv *C.nif_arg_t) C.ERL_NIF_TERM {
 	if ok == false {
 		return returnErrorStatusWithMessage(env,  "given invalid file id")
 	}
-	if err := file.SaveAs(path); err != nil {
+	file.Lock()
+	defer file.Unlock()
+	if err := file.data.SaveAs(path); err != nil {
 		return returnErrorStatusWithMessage(env,  err.Error())
 	}
 	status := convertGoStringToErlAtom(env, "ok")
@@ -103,7 +111,9 @@ func Save(env *C.ErlNifEnv, argc C.int, argv *C.nif_arg_t) C.ERL_NIF_TERM {
 	if ok == false {
 		return returnErrorStatusWithMessage(env,  "given invalid file id")
 	}
-	if err := file.Save(); err != nil {
+	file.Lock()
+	defer file.Unlock()
+	if err := file.data.Save(); err != nil {
 		return returnErrorStatusWithMessage(env,  err.Error())
 	}
 	status := convertGoStringToErlAtom(env, "ok")
@@ -118,7 +128,9 @@ func DeleteSheet(env *C.ErlNifEnv, argc C.int, argv *C.nif_arg_t) C.ERL_NIF_TERM
 	if ok == false {
 		return returnErrorStatusWithMessage(env,  "given invalid file id")
 	}
-	file.DeleteSheet(sheetName)
+	file.Lock()
+	defer file.Unlock()
+	file.data.DeleteSheet(sheetName)
 	status := convertGoStringToErlAtom(env, "ok")
 	return C.enif_make_tuple2(env, status, convertGoStringToErlBinary(env, fileId))
 }
@@ -132,7 +144,9 @@ func CopySheet(env *C.ErlNifEnv, argc C.int, argv *C.nif_arg_t) C.ERL_NIF_TERM {
 	if ok == false {
 		return returnErrorStatusWithMessage(env,  "given invalid file id")
 	}
-	if err := file.CopySheet(from, to) ; err != nil {
+	file.Lock()
+	defer file.Unlock()
+	if err := file.data.CopySheet(from, to) ; err != nil {
 		return returnErrorStatusWithMessage(env,  err.Error())
 	}
 	status := convertGoStringToErlAtom(env, "ok")
@@ -148,7 +162,9 @@ func SetSheetBackground(env *C.ErlNifEnv, argc C.int, argv *C.nif_arg_t) C.ERL_N
 	if ok == false {
 		return returnErrorStatusWithMessage(env,  "given invalid file id")
 	}
-	if err := file.SetSheetBackground(sheetName, picturePath); err != nil {
+	file.Lock()
+	defer file.Unlock()
+	if err := file.data.SetSheetBackground(sheetName, picturePath); err != nil {
 		return returnErrorStatusWithMessage(env,  err.Error())
 	}
 	status := convertGoStringToErlAtom(env, "ok")
@@ -162,7 +178,9 @@ func GetActiveSheetIndex(env *C.ErlNifEnv, argc C.int, argv *C.nif_arg_t) C.ERL_
 	if ok == false {
 		return returnErrorStatusWithMessage(env,  "given invalid file id")
 	}
-	activeSheetIndex := file.GetActiveSheetIndex()
+	file.Lock()
+	defer file.Unlock()
+	activeSheetIndex := file.data.GetActiveSheetIndex()
 	erlActiveSheetIndexTerm := convertGoIntToErlInt(env, activeSheetIndex)
 	status := convertGoStringToErlAtom(env, "ok")
 	return C.enif_make_tuple2(env, status, erlActiveSheetIndexTerm)
@@ -185,7 +203,9 @@ func SetActiveSheetVisible(env *C.ErlNifEnv, argc C.int, argv *C.nif_arg_t) C.ER
 	} else {
 		return returnErrorStatusWithMessage(env,  "given invalid value")
 	}
-	if err := file.SetSheetVisible(sheetName, boolValue); err != nil {
+	file.Lock()
+	defer file.Unlock()
+	if err := file.data.SetSheetVisible(sheetName, boolValue); err != nil {
 		return returnErrorStatusWithMessage(env, err.Error())
 	}
 	status := convertGoStringToErlAtom(env, "ok")
@@ -216,7 +236,9 @@ func SetColWidth(env *C.ErlNifEnv, argc C.int, argv *C.nif_arg_t) C.ERL_NIF_TERM
 	if ok == false {
 		return returnErrorStatusWithMessage(env, "given invalid file id")
 	}
-	err := file.SetColWidth(sheetName, startCol, endCol, width)
+	file.Lock()
+	defer file.Unlock()
+	err := file.data.SetColWidth(sheetName, startCol, endCol, width)
 	if err != nil {
 		return returnErrorStatusWithMessage(env, err.Error())
 	}
@@ -235,7 +257,9 @@ func SetRowHeight(env *C.ErlNifEnv, argc C.int, argv *C.nif_arg_t) C.ERL_NIF_TER
 	if ok == false {
 		return returnErrorStatusWithMessage(env, "given invalid file id")
 	}
-	err := file.SetRowHeight(sheetName, row, height)
+	file.Lock()
+	defer file.Unlock()
+	err := file.data.SetRowHeight(sheetName, row, height)
 	if err != nil {
 		return returnErrorStatusWithMessage(env, err.Error())
 	}
@@ -251,7 +275,9 @@ func NewSheet(env *C.ErlNifEnv, argc C.int, argv *C.nif_arg_t) C.ERL_NIF_TERM {
 	if ok == false {
 		return returnErrorStatusWithMessage(env, "given invalid file id")
 	}
-	index := file.NewSheet(sheetName)
+	file.Lock()
+	defer file.Unlock()
+	index := file.data.NewSheet(sheetName)
 	erlIndex := convertGoIntToErlInt(env, index)
 
 	status := convertGoStringToErlAtom(env, "ok")
@@ -266,7 +292,9 @@ func SetActiveSheet(env *C.ErlNifEnv, argc C.int, argv *C.nif_arg_t) C.ERL_NIF_T
 	if ok == false {
 		return returnErrorStatusWithMessage(env, "given invalid file id")
 	}
-	file.SetActiveSheet(sheetId)
+	file.Lock()
+	defer file.Unlock()
+	file.data.SetActiveSheet(sheetId)
 	status := convertGoStringToErlAtom(env, "ok")
 	return C.enif_make_tuple2(env, status, convertGoStringToErlBinary(env, fileId))
 }
@@ -289,7 +317,9 @@ func SetCellValue(env *C.ErlNifEnv, argc C.int, argv *C.nif_arg_t) C.ERL_NIF_TER
 	if err != nil {
 		return returnErrorStatusWithMessage(env, err.Error())
 	}
-	file.SetCellValue(sheetName, column, value)
+	file.Lock()
+	defer file.Unlock()
+	file.data.SetCellValue(sheetName, column, value)
 	status := convertGoStringToErlAtom(env, "ok")
 	return C.enif_make_tuple2(env, status, convertGoStringToErlBinary(env, fileId))
 }
@@ -305,11 +335,13 @@ func SetCellStyle(env *C.ErlNifEnv, argc C.int, argv *C.nif_arg_t) C.ERL_NIF_TER
 	if ok == false {
 		return returnErrorStatusWithMessage(env, "given invalid file id")
 	}
-	styleId, err := file.NewStyle(style)
+	file.Lock()
+	defer file.Unlock()
+	styleId, err := file.data.NewStyle(style)
 	if err != nil {
 		return returnErrorStatusWithMessage(env, err.Error())
 	}
-	file.SetCellStyle(sheetName, hcell, vcell, styleId)
+	file.data.SetCellStyle(sheetName, hcell, vcell, styleId)
 	status := convertGoStringToErlAtom(env, "ok")
 	return C.enif_make_tuple2(env, status, convertGoStringToErlBinary(env, fileId))
 }
@@ -326,7 +358,9 @@ func SetRow(env *C.ErlNifEnv, argc C.int, argv *C.nif_arg_t) C.ERL_NIF_TERM {
 	if ok == false {
 		return returnErrorStatusWithMessage(env, "given invalid file id")
 	}
-	streamWriter, err := file.NewStreamWriter(sheetName)
+	file.Lock()
+	defer file.Unlock()
+	streamWriter, err := file.data.NewStreamWriter(sheetName)
 	if err != nil {
 		return returnErrorStatusWithMessage(env, err.Error())
 	}
@@ -349,7 +383,7 @@ func SetRow(env *C.ErlNifEnv, argc C.int, argv *C.nif_arg_t) C.ERL_NIF_TERM {
 		var styleID int
 		styleID, ok = styleIDStore[style]
 		if !ok {
-			styleID, err = file.NewStyle(style)
+			styleID, err = file.data.NewStyle(style)
 			if err != nil {
 				return returnErrorStatusWithMessage(env, err.Error())
 			}
@@ -376,13 +410,13 @@ func SetRow(env *C.ErlNifEnv, argc C.int, argv *C.nif_arg_t) C.ERL_NIF_TERM {
 
 // --------------------------- PrivFunction ---------------------------
 
-func registerFilePtr(file *excelize.File) string {
+func registerFilePtr(data *excelize.File) string {
 	if fileStore == nil {
-		fileStore = make(map[string]*excelize.File)
+		fileStore = make(map[string]ExcelizerFile)
 	}
 	uuidObject := uuid.New()
 	uuidStr := uuidObject.String()
-	fileStore[uuidStr] = file
+	fileStore[uuidStr] = ExcelizerFile{data: data}
 	return uuidStr
 }
 

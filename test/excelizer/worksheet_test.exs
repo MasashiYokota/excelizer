@@ -48,7 +48,7 @@ defmodule Excelizer.WorksheetTest do
     end
   end
 
-  describe "set_row_height/5" do
+  describe "set_row_height/4" do
     test "sets width col width", %{file_id: file_id} do
       {status, resp} = Worksheet.set_row_height(file_id, "Sheet1", 1, 100)
       assert status == :ok
@@ -66,7 +66,7 @@ defmodule Excelizer.WorksheetTest do
     end
   end
 
-  describe "set_row_height!/5" do
+  describe "set_row_height!/4" do
     test "sets width col width", %{file_id: file_id} do
       resp = Worksheet.set_row_height!(file_id, "Sheet1", 1, 100)
       assert resp == file_id
