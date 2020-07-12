@@ -82,4 +82,39 @@ defmodule Excelizer.WorksheetTest do
       end
     end
   end
+
+  describe "set_col_visible/3" do
+    test "sets width col width", %{file_id: file_id} do
+      {status, resp} = Worksheet.set_col_visible(file_id, "Sheet1", "A", true)
+      assert status == :ok
+      assert resp == file_id
+    end
+
+    test "fails to set col width", %{file_id: file_id} do
+      {status, resp} = Worksheet.set_col_visible("invalid ", "Sheet1", "A", true)
+      assert status == :error
+      assert resp == "given invalid file id"
+
+      {status, resp} = Worksheet.set_col_visible(file_id, "Sheet1", 1, true)
+      assert status == :error
+      assert resp == "invalid column name \"\""
+    end
+  end
+
+  describe "set_col_visible!/3" do
+    test "sets width col width", %{file_id: file_id} do
+      resp = Worksheet.set_col_visible!(file_id, "Sheet1", "A", true)
+      assert resp == file_id
+    end
+
+    test "fails to set col width", %{file_id: file_id} do
+      assert_raise Excelizer.Exception, "given invalid file id", fn ->
+        Worksheet.set_col_visible!("invalid ", "Sheet1", "A", true)
+      end
+
+      assert_raise Excelizer.Exception, "invalid column name \"\"", fn ->
+        Worksheet.set_col_visible!(file_id, "Sheet1", 1, true)
+      end
+    end
+  end
 end

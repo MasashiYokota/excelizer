@@ -28,7 +28,7 @@
 - [ ] GetDocProps
 
 ### Worksheet
-- [ ] SetColVisible
+- [x] SetColVisible
 - [x] SetColWidth
 - [x] SetRowHeight
 - [ ] SetRowVisible

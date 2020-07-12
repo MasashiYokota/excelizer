@@ -33,4 +33,19 @@ defmodule Excelizer.Worksheet do
       {:error, err_msg} -> raise Excelizer.Exception, message: err_msg
     end
   end
+
+  @spec set_col_visible(Base.file_id(), String.t(), String.t(), boolean) ::
+          Base.nif_resp(Base.file_id())
+  def set_col_visible(file_id, sheet_name, col, visible) do
+    Base.set_col_visible(file_id, sheet_name, col, "#{visible}")
+  end
+
+  @spec set_col_visible!(Base.file_id(), String.t(), String.t(), boolean) ::
+          Base.file_id()
+  def set_col_visible!(file_id, sheet_name, col, visible) do
+    case Base.set_col_visible(file_id, sheet_name, col, "#{visible}") do
+      {:ok, file_id} -> file_id
+      {:error, err_msg} -> raise Excelizer.Exception, message: err_msg
+    end
+  end
 end

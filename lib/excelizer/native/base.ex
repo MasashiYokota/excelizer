@@ -10,7 +10,9 @@ defmodule Excelizer.Native.Base do
       :ok ->
         :ok
 
-      _ ->
+      e ->
+        IO.inspect(e)
+
         raise """
         An error occurred when loading Excelizer Go library.
         Make sure your environemnt (e.g. C compiler, Erlang version, Elixir version).
@@ -38,6 +40,11 @@ defmodule Excelizer.Native.Base do
           nif_resp(file_id())
   def set_row_height(file_id, sheet_name, row, height)
   def set_row_height(_, _, _, _), do: :erlang.nif_error(:not_loaded)
+
+  @spec set_col_visible(file_id(), String.t(), String.t(), String.t()) ::
+          nif_resp(file_id())
+  def set_col_visible(file_id, sheet_name, col, boolean)
+  def set_col_visible(_, _, _, _), do: :erlang.nif_error(:not_loaded)
 
   def new_sheet(file_id, sheet_name)
   def new_sheet(_, _), do: :erlang.nif_error(:not_loaded)

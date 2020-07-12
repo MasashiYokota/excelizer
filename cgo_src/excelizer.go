@@ -267,6 +267,28 @@ func SetRowHeight(env *C.ErlNifEnv, argc C.int, argv *C.nif_arg_t) C.ERL_NIF_TER
 	return C.enif_make_tuple2(env, status, convertGoStringToErlBinary(env, fileId))
 }
 
+
+//export SetColVisible
+func SetColVisible(env *C.ErlNifEnv, argc C.int, argv *C.nif_arg_t) C.ERL_NIF_TERM {
+	fileId := extractArgAsGoString(env, argv, 0)
+	sheetName := extractArgAsGoString(env, argv, 1)
+	col := extractArgAsGoString(env, argv, 2)
+	visible := extractArgAsGoBoolean(env, argv, 3)
+
+	file, ok := fileStore[fileId]
+	if ok == false {
+		return returnErrorStatusWithMessage(env, "given invalid file id")
+	}
+	file.Lock()
+	defer file.Unlock()
+	err := file.data.SetColVisible(sheetName, col, visible)
+	if err != nil {
+		return returnErrorStatusWithMessage(env, err.Error())
+	}
+	status := convertGoStringToErlAtom(env, "ok")
+	return C.enif_make_tuple2(env, status, convertGoStringToErlBinary(env, fileId))
+}
+
 //export NewSheet
 func NewSheet(env *C.ErlNifEnv, argc C.int, argv *C.nif_arg_t) C.ERL_NIF_TERM {
 	fileId := extractArgAsGoString(env, argv, 0)
@@ -522,6 +544,18 @@ func extractArgAsGoString(env *C.ErlNifEnv, argv *C.nif_arg_t, argIndex int) str
 	erlValueTerm := C.get_arg(argv, C.int(argIndex))
 	C.enif_inspect_binary(env, erlValueTerm, &erlValue);
 	return convertErlBinaryToGoString(erlValue)
+}
+
+func extractArgAsGoBoolean(env *C.ErlNifEnv, argv *C.nif_arg_t, argIndex int) bool {
+	var erlValue C.ErlNifBinary;
+	erlValueTerm := C.get_arg(argv, C.int(argIndex))
+	C.enif_inspect_binary(env, erlValueTerm, &erlValue);
+	data := convertErlBinaryToGoString(erlValue)
+	if data == "true" {
+		return true
+	} else {
+		return false
+	}
 }
 
 func extractArgAsGoInt(env *C.ErlNifEnv, argv *C.nif_arg_t, argIndex int) int {
