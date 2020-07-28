@@ -341,6 +341,21 @@ func SetActiveSheet(env *C.ErlNifEnv, argc C.int, argv *C.nif_arg_t) C.ERL_NIF_T
 	return C.enif_make_tuple2(env, status, convertGoStringToErlBinary(env, fileId))
 }
 
+//export GetSheetName
+func GetSheetName(env *C.ErlNifEnv, argc C.int, argv *C.nif_arg_t) C.ERL_NIF_TERM {
+	fileId := extractArgAsGoString(env, argv, 0)
+	sheetId := extractArgAsGoInt(env, argv, 1)
+	file, ok := fileStore[fileId]
+	if ok == false {
+		return returnErrorStatusWithMessage(env, "given invalid file id")
+	}
+	file.Lock()
+	defer file.Unlock()
+	sheetName := file.data.GetSheetName(sheetId)
+	status := convertGoStringToErlAtom(env, "ok")
+	return C.enif_make_tuple2(env, status, convertGoStringToErlBinary(env, sheetName))
+}
+
 // --------------------------- Cell ---------------------------
 
 //export SetCellValue

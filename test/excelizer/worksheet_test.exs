@@ -152,4 +152,24 @@ defmodule Excelizer.WorksheetTest do
       end
     end
   end
+
+  describe "get_sheet_name/2" do
+    test "get sheet name", %{file_id: file_id} do
+      {status, resp} = Worksheet.get_sheet_name(file_id, 0)
+      assert status == :ok
+      assert resp == "Sheet1"
+    end
+
+    test "return blank string when given invalid sheet id", %{file_id: file_id} do
+      {status, resp} = Worksheet.get_sheet_name(file_id, -100)
+      assert status == :ok
+      assert resp == ""
+    end
+
+    test "fails to set row visible" do
+      {status, resp} = Worksheet.get_sheet_name("invalid ", 1)
+      assert status == :error
+      assert resp == "given invalid file id"
+    end
+  end
 end

@@ -74,6 +74,10 @@ ERL_NIF_TERM set_active_sheet(ErlNifEnv *env, int argc, const ERL_NIF_TERM argv[
   return SetActiveSheet(env, argc, argv);
 }
 
+ERL_NIF_TERM get_sheet_name(ErlNifEnv *env, int argc, const ERL_NIF_TERM argv[]) {
+  return GetSheetName(env, argc, argv);
+}
+
 // --------------------------- Cell ---------------------------
 ERL_NIF_TERM set_cell_value(ErlNifEnv *env, int argc, const ERL_NIF_TERM argv[]) {
   return SetCellValue(env, argc, argv);
@@ -98,6 +102,7 @@ static ErlNifFunc excelixir_nif_funcs[] = {
   {"set_col_width", 5, set_col_width},
   {"set_row_height", 4, set_row_height},
   {"set_active_sheet", 2, set_active_sheet},
+  {"get_sheet_name", 2, get_sheet_name},
   {"save_as", 2, save_as},
   {"save", 1, save},
   {"delete_sheet", 2, delete_sheet},

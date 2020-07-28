@@ -63,4 +63,17 @@ defmodule Excelizer.Worksheet do
       {:error, err_msg} -> raise Excelizer.Exception, message: err_msg
     end
   end
+
+  @spec get_sheet_name(Base.file_id(), integer()) :: Base.nif_resp(String.t())
+  def get_sheet_name(file_id, sheet_id) do
+    Base.get_sheet_name(file_id, sheet_id)
+  end
+
+  @spec get_sheet_name!(Base.file_id(), integer()) :: String.t()
+  def get_sheet_name!(file_id, sheet_id) do
+    case Base.get_sheet_name(file_id, sheet_id) do
+      {:ok, sheet_name} -> sheet_name
+      {:error, err_msg} -> raise Excelizer.Exception, message: err_msg
+    end
+  end
 end
