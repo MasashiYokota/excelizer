@@ -120,4 +120,17 @@ defmodule Excelizer.Worksheet do
       {:error, err_msg} -> raise Excelizer.Exception, message: err_msg
     end
   end
+
+  @spec get_sheet_index(Base.file_id(), String.t()) :: Base.nif_resp(integer())
+  def get_sheet_index(file_id, sheet_name) do
+    Base.get_sheet_index(file_id, sheet_name)
+  end
+
+  @spec get_sheet_index!(Base.file_id(), String.t()) :: integer()
+  def get_sheet_index!(file_id, sheet_name) do
+    case Base.get_sheet_index(file_id, sheet_name) do
+      {:ok, index} -> index
+      {:error, err_msg} -> raise Excelizer.Exception, message: err_msg
+    end
+  end
 end

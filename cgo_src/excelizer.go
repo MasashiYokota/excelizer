@@ -239,7 +239,7 @@ func GetColVisible(env *C.ErlNifEnv, argc C.int, argv *C.nif_arg_t) C.ERL_NIF_TE
 	}
 	file.Lock()
 	defer file.Unlock()
-	visible, err := file.data.GetColVisible(sheetName, column);
+	visible, err := file.data.GetColVisible(sheetName, column)
 	if err != nil {
 		return returnErrorStatusWithMessage(env, err.Error())
 	}
@@ -258,7 +258,7 @@ func GetColWidth(env *C.ErlNifEnv, argc C.int, argv *C.nif_arg_t) C.ERL_NIF_TERM
 	}
 	file.Lock()
 	defer file.Unlock()
-	width, err := file.data.GetColWidth(sheetName, column);
+	width, err := file.data.GetColWidth(sheetName, column)
 	if err != nil {
 		return returnErrorStatusWithMessage(env, err.Error())
 	}
@@ -277,7 +277,7 @@ func GetRowHeight(env *C.ErlNifEnv, argc C.int, argv *C.nif_arg_t) C.ERL_NIF_TER
 	}
 	file.Lock()
 	defer file.Unlock()
-	height, err := file.data.GetRowHeight(sheetName, row);
+	height, err := file.data.GetRowHeight(sheetName, row)
 	if err != nil {
 		return returnErrorStatusWithMessage(env, err.Error())
 	}
@@ -296,12 +296,27 @@ func GetRowVisible(env *C.ErlNifEnv, argc C.int, argv *C.nif_arg_t) C.ERL_NIF_TE
 	}
 	file.Lock()
 	defer file.Unlock()
-	visible, err := file.data.GetRowVisible(sheetName, row);
+	visible, err := file.data.GetRowVisible(sheetName, row)
 	if err != nil {
 		return returnErrorStatusWithMessage(env, err.Error())
 	}
 	status := convertGoStringToErlAtom(env, "ok")
 	return C.enif_make_tuple2(env, status, convertGoStringToErlBinary(env, strconv.FormatBool(visible)))
+}
+
+//export GetSheetIndex
+func GetSheetIndex(env *C.ErlNifEnv, argc C.int, argv *C.nif_arg_t) C.ERL_NIF_TERM {
+	fileId := extractArgAsGoString(env, argv, 0)
+	sheetName := extractArgAsGoString(env, argv, 1)
+	file, ok := fileStore[fileId]
+	if ok == false {
+		return returnErrorStatusWithMessage(env,  "given invalid file id")
+	}
+	file.Lock()
+	defer file.Unlock()
+	sheetIndex := file.data.GetSheetIndex(sheetName)
+	status := convertGoStringToErlAtom(env, "ok")
+	return C.enif_make_tuple2(env, status, convertGoIntToErlInt(env, sheetIndex))
 }
 
 //export CloseFile

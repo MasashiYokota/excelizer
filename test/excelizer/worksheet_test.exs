@@ -278,4 +278,24 @@ defmodule Excelizer.WorksheetTest do
       end
     end
   end
+
+  describe "get_sheet_index/3" do
+    test "return {:ok, index} of given valid sheet_name", %{file_id: file_id} do
+      {status, index} = Worksheet.get_sheet_index(file_id, "Sheet1")
+      assert status == :ok
+      assert index == 0
+    end
+
+    test "return {:ok, -1} when given invaid sheet_name", %{file_id: file_id} do
+      {status, index} = Worksheet.get_sheet_index(file_id, "Sheet100")
+      assert status == :ok
+      assert index == -1
+    end
+
+    test "return {:error, error_msg} of given invalid sheet_name and height" do
+      {status, error} = Worksheet.get_sheet_index("invalid file_id", "Sheet1")
+      assert status == :error
+      assert error == "given invalid file id"
+    end
+  end
 end
