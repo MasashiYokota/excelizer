@@ -223,4 +223,39 @@ defmodule Excelizer.WorksheetTest do
       end
     end
   end
+
+  describe "get_row_height/3" do
+    test "return {:ok, height} of given valid sheet_name and height", %{file_id: file_id} do
+      {status, width} = Worksheet.get_row_height(file_id, "Sheet1", 1)
+      assert status == :ok
+      assert width == 20.0
+    end
+
+    test "return {:error, error_msg} of given invalid sheet_name and height", %{file_id: file_id} do
+      {status, width} = Worksheet.get_row_height("invalid file_id", "Sheet1", 1)
+      assert status == :error
+      assert width == "given invalid file id"
+
+      {status, width} = Worksheet.get_row_height(file_id, "Sheet1", "A")
+      assert status == :error
+      assert width == "invalid row number 0"
+    end
+  end
+
+  describe "get_row_height!/3" do
+    test "return height of given valid sheet_name and height", %{file_id: file_id} do
+      width = Worksheet.get_row_height!(file_id, "Sheet1", 1)
+      assert width == 20.0
+    end
+
+    test "raise error when given invalid sheet_name and height", %{file_id: file_id} do
+      assert_raise Excelizer.Exception, "given invalid file id", fn ->
+        Worksheet.get_row_height!("invalid file id", "Sheet1", 1)
+      end
+
+      assert_raise Excelizer.Exception, "invalid row number 0", fn ->
+        Worksheet.get_row_height!(file_id, "Sheet1", "A")
+      end
+    end
+  end
 end

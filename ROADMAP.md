@@ -35,7 +35,7 @@
 - [x] GetSheetName
 - [x] GetColVisible
 - [x] GetColWidth
-- [ ] GetRowHeight
+- [x] GetRowHeight
 - [ ] GetRowVisible
 - [ ] GetSheetIndex
 - [ ] GetSheetMap

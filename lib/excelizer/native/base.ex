@@ -90,6 +90,9 @@ defmodule Excelizer.Native.Base do
   def get_col_width(file_id, sheet_id, column)
   def get_col_width(_, _, _), do: :erlang.nif_error(:not_loaded)
 
+  def get_row_height(file_id, sheet_id, height)
+  def get_row_height(_, _, _), do: :erlang.nif_error(:not_loaded)
+
   def close_file(file_id)
   def close_file(_), do: :erlang.nif_error(:not_loaded)
 

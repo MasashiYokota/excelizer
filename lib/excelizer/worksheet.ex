@@ -98,4 +98,17 @@ defmodule Excelizer.Worksheet do
       {:error, err_msg} -> raise Excelizer.Exception, message: err_msg
     end
   end
+
+  @spec get_row_height(Base.file_id(), String.t(), pos_integer()) :: Base.nif_resp(float)
+  def get_row_height(file_id, sheet_name, row) do
+    Base.get_row_height(file_id, sheet_name, row)
+  end
+
+  @spec get_row_height!(Base.file_id(), String.t(), pos_integer()) :: float
+  def get_row_height!(file_id, sheet_name, row) do
+    case Base.get_row_height(file_id, sheet_name, row) do
+      {:ok, height} -> height
+      {:error, err_msg} -> raise Excelizer.Exception, message: err_msg
+    end
+  end
 end
