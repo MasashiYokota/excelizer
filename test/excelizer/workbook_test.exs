@@ -225,4 +225,21 @@ defmodule Excelizer.WorkbookTest do
       end
     end
   end
+
+  describe "get_sheet_visible/2" do
+    test "get a visibility status of given sheet name", %{file_id: file_id} do
+      assert Workbook.get_sheet_visible(file_id, "Sheet1")
+
+      Workbook.new_sheet!(file_id, "Sheet2")
+      Workbook.set_sheet_visible!(file_id, "Sheet2", false)
+
+      refute Workbook.get_sheet_visible(file_id, "Sheet2")
+    end
+
+    test "fails to check a sheet visibility" do
+      assert_raise Excelizer.Exception, "given invalid file id", fn ->
+        Workbook.get_sheet_visible("invalid file id", "Sheet1")
+      end
+    end
+  end
 end

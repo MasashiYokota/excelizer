@@ -85,4 +85,13 @@ defmodule Excelizer.Workbook do
       {:error, err} -> raise Excelizer.Exception, message: err
     end
   end
+
+  @spec get_sheet_visible(Base.file_id(), String.t()) :: boolean
+  def get_sheet_visible(file_id, sheet_name) do
+    case Base.get_sheet_visible(file_id, sheet_name) do
+      {:ok, "true"} -> true
+      {:ok, "false"} -> false
+      {:error, err} -> raise Excelizer.Exception, message: err
+    end
+  end
 end

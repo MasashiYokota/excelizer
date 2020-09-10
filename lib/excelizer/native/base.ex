@@ -78,6 +78,9 @@ defmodule Excelizer.Native.Base do
   def set_sheet_visible(file_id, sheet_name, visible)
   def set_sheet_visible(_, _, _), do: :erlang.nif_error(:not_loaded)
 
+  def get_sheet_visible(file_id, sheet_name)
+  def get_sheet_visible(_, _), do: :erlang.nif_error(:not_loaded)
+
   def get_sheet_name(file_id, sheet_id)
   def get_sheet_name(_, _), do: :erlang.nif_error(:not_loaded)
 

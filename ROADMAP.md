@@ -11,7 +11,7 @@
 - [x] SetActiveSheet
 - [x] GetActiveSheetIndex
 - [x] SetSheetVisible
-- [ ] GetSheetVisible
+- [x] GetSheetVisible
 - [ ] SetSheetFormatPr
 - [ ] GetSheetFormatPr
 - [ ] SetSheetViewOptions

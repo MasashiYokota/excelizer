@@ -18,6 +18,7 @@ static ERL_NIF_TERM get_arg(ERL_NIF_TERM* arg, int index) {
 import "C"
 import (
 	"errors"
+	"strconv"
 	"sync"
 	"time"
 	"unsafe"
@@ -210,6 +211,21 @@ func SetSheetVisible(env *C.ErlNifEnv, argc C.int, argv *C.nif_arg_t) C.ERL_NIF_
 	}
 	status := convertGoStringToErlAtom(env, "ok")
 	return C.enif_make_tuple2(env, status, convertGoStringToErlBinary(env, fileId))
+}
+
+//export GetSheetVisible
+func GetSheetVisible(env *C.ErlNifEnv, argc C.int, argv *C.nif_arg_t) C.ERL_NIF_TERM {
+	fileId := extractArgAsGoString(env, argv, 0)
+	sheetName := extractArgAsGoString(env, argv, 1)
+	file, ok := fileStore[fileId]
+	if ok == false {
+		return returnErrorStatusWithMessage(env,  "given invalid file id")
+	}
+	file.Lock()
+	defer file.Unlock()
+	visible := file.data.GetSheetVisible(sheetName)
+	status := convertGoStringToErlAtom(env, "ok")
+	return C.enif_make_tuple2(env, status, convertGoStringToErlBinary(env, strconv.FormatBool(visible)))
 }
 
 //export CloseFile
