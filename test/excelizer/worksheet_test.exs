@@ -324,4 +324,56 @@ defmodule Excelizer.WorksheetTest do
       assert error == "invalid column name \"1\""
     end
   end
+
+  describe "insert_col!/3" do
+    test "return file_id of given valid sheet_name and column", %{file_id: file_id} do
+      id = Worksheet.insert_col!(file_id, "Sheet1", "A")
+      assert id == file_id
+    end
+
+    test "return :ok of given invalid sheet_name and column", %{file_id: file_id} do
+      assert_raise Excelizer.Exception, "given invalid file id", fn ->
+        Worksheet.insert_col!("invalid file id", "Sheet1", 1)
+      end
+
+      assert_raise Excelizer.Exception, "invalid column name \"1\"", fn ->
+        Worksheet.insert_col!(file_id, "Sheet1", "1")
+      end
+    end
+  end
+
+  describe "insert_row/3" do
+    test "return {:ok, file_id} of given valid sheet_name and row", %{file_id: file_id} do
+      {status, id} = Worksheet.insert_row(file_id, "Sheet1", 1)
+      assert status == :ok
+      assert id == file_id
+    end
+
+    test "return {:ok, error_msg} of given invalid sheet_name and row", %{file_id: file_id} do
+      {status, error} = Worksheet.insert_row("invalid file_id", "Sheet1", 1)
+      assert status == :error
+      assert error == "given invalid file id"
+
+      {status, error} = Worksheet.insert_row(file_id, "Sheet1", "A")
+      assert status == :error
+      assert error == "invalid row number 0"
+    end
+  end
+
+  describe "insert_row!/3" do
+    test "return file_id of given valid sheet_name and row", %{file_id: file_id} do
+      id = Worksheet.insert_row!(file_id, "Sheet1", 1)
+      assert id == file_id
+    end
+
+    test "return :ok of given invalid sheet_name and row", %{file_id: file_id} do
+      assert_raise Excelizer.Exception, "given invalid file id", fn ->
+        Worksheet.insert_row!("invalid file id", "Sheet1", 1)
+      end
+
+      assert_raise Excelizer.Exception, "invalid row number 0", fn ->
+        Worksheet.insert_row!(file_id, "Sheet1", "A")
+      end
+    end
+  end
 end

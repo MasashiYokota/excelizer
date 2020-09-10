@@ -44,7 +44,7 @@
 - [ ] SetSheetPrOptions
 - [ ] GetSheetPrOptions
 - [x] InsertCol
-- [ ] InsertRow
+- [x] InsertRow
 - [ ] DuplicateRow
 - [ ] DuplicateRowTo
 - [ ] SetRowOutlineLevel

@@ -152,4 +152,17 @@ defmodule Excelizer.Worksheet do
       {:error, err_msg} -> raise Excelizer.Exception, message: err_msg
     end
   end
+
+  @spec insert_row(Base.file_id(), String.t(), integer()) :: Base.nif_resp(Base.file_id())
+  def insert_row(file_id, sheet_name, row) do
+    Base.insert_row(file_id, sheet_name, row)
+  end
+
+  @spec insert_row!(Base.file_id(), String.t(), integer()) :: Base.file_id()
+  def insert_row!(file_id, sheet_name, row) do
+    case Base.insert_row(file_id, sheet_name, row) do
+      {:ok, file_id} -> file_id
+      {:error, err_msg} -> raise Excelizer.Exception, message: err_msg
+    end
+  end
 end

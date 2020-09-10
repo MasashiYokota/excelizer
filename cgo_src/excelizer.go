@@ -497,6 +497,24 @@ func InsertCol(env *C.ErlNifEnv, argc C.int, argv *C.nif_arg_t) C.ERL_NIF_TERM {
 	return C.enif_make_tuple2(env, status, convertGoStringToErlBinary(env, fileId))
 }
 
+//export InsertRow
+func InsertRow(env *C.ErlNifEnv, argc C.int, argv *C.nif_arg_t) C.ERL_NIF_TERM {
+	fileId := extractArgAsGoString(env, argv, 0)
+	sheetName := extractArgAsGoString(env, argv, 1)
+	row := extractArgAsGoInt(env, argv, 2)
+	file, ok := fileStore[fileId]
+	if ok == false {
+		return returnErrorStatusWithMessage(env, "given invalid file id")
+	}
+	file.Lock()
+	defer file.Unlock()
+	if err := file.data.InsertRow(sheetName, row); err != nil {
+		return returnErrorStatusWithMessage(env, err.Error())
+	}
+	status := convertGoStringToErlAtom(env, "ok")
+	return C.enif_make_tuple2(env, status, convertGoStringToErlBinary(env, fileId))
+}
+
 // --------------------------- Cell ---------------------------
 
 //export SetCellValue
