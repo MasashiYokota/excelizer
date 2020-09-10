@@ -306,4 +306,22 @@ defmodule Excelizer.WorksheetTest do
       assert name == "new"
     end
   end
+
+  describe "insert_col/3" do
+    test "return {:ok, file_id} of given valid sheet_name and column", %{file_id: file_id} do
+      {status, id} = Worksheet.insert_col(file_id, "Sheet1", "A")
+      assert status == :ok
+      assert id == file_id
+    end
+
+    test "return {:ok, error_msg} of given invalid sheet_name and column", %{file_id: file_id} do
+      {status, error} = Worksheet.insert_col("invalid file_id", "Sheet1", "A")
+      assert status == :error
+      assert error == "given invalid file id"
+
+      {status, error} = Worksheet.insert_col(file_id, "Sheet1", "1")
+      assert status == :error
+      assert error == "invalid column name \"1\""
+    end
+  end
 end

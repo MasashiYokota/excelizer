@@ -106,6 +106,10 @@ ERL_NIF_TERM set_sheet_name(ErlNifEnv *env, int argc, const ERL_NIF_TERM argv[])
   return SetSheetName(env, argc, argv);
 }
 
+ERL_NIF_TERM insert_col(ErlNifEnv *env, int argc, const ERL_NIF_TERM argv[]) {
+  return InsertCol(env, argc, argv);
+}
+
 // --------------------------- Cell ---------------------------
 ERL_NIF_TERM set_cell_value(ErlNifEnv *env, int argc, const ERL_NIF_TERM argv[]) {
   return SetCellValue(env, argc, argv);
@@ -137,6 +141,7 @@ static ErlNifFunc excelixir_nif_funcs[] = {
   {"get_row_visible", 3, get_row_visible},
   {"get_sheet_index", 2, get_sheet_index},
   {"set_sheet_name", 3, set_sheet_name},
+  {"insert_col", 3, insert_col},
   {"save_as", 2, save_as},
   {"save", 1, save},
   {"delete_sheet", 2, delete_sheet},

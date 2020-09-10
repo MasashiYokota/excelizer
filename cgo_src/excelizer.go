@@ -228,113 +228,6 @@ func GetSheetVisible(env *C.ErlNifEnv, argc C.int, argv *C.nif_arg_t) C.ERL_NIF_
 	return C.enif_make_tuple2(env, status, convertGoStringToErlBinary(env, strconv.FormatBool(visible)))
 }
 
-//export GetColVisible
-func GetColVisible(env *C.ErlNifEnv, argc C.int, argv *C.nif_arg_t) C.ERL_NIF_TERM {
-	fileId := extractArgAsGoString(env, argv, 0)
-	sheetName := extractArgAsGoString(env, argv, 1)
-	column := extractArgAsGoString(env, argv, 2)
-	file, ok := fileStore[fileId]
-	if ok == false {
-		return returnErrorStatusWithMessage(env,  "given invalid file id")
-	}
-	file.Lock()
-	defer file.Unlock()
-	visible, err := file.data.GetColVisible(sheetName, column)
-	if err != nil {
-		return returnErrorStatusWithMessage(env, err.Error())
-	}
-	status := convertGoStringToErlAtom(env, "ok")
-	return C.enif_make_tuple2(env, status, convertGoStringToErlBinary(env, strconv.FormatBool(visible)))
-}
-
-//export GetColWidth
-func GetColWidth(env *C.ErlNifEnv, argc C.int, argv *C.nif_arg_t) C.ERL_NIF_TERM {
-	fileId := extractArgAsGoString(env, argv, 0)
-	sheetName := extractArgAsGoString(env, argv, 1)
-	column := extractArgAsGoString(env, argv, 2)
-	file, ok := fileStore[fileId]
-	if ok == false {
-		return returnErrorStatusWithMessage(env,  "given invalid file id")
-	}
-	file.Lock()
-	defer file.Unlock()
-	width, err := file.data.GetColWidth(sheetName, column)
-	if err != nil {
-		return returnErrorStatusWithMessage(env, err.Error())
-	}
-	status := convertGoStringToErlAtom(env, "ok")
-	return C.enif_make_tuple2(env, status, convertGoFloat64ToErlFloat(env, width))
-}
-
-//export GetRowHeight
-func GetRowHeight(env *C.ErlNifEnv, argc C.int, argv *C.nif_arg_t) C.ERL_NIF_TERM {
-	fileId := extractArgAsGoString(env, argv, 0)
-	sheetName := extractArgAsGoString(env, argv, 1)
-	row := extractArgAsGoInt(env, argv, 2)
-	file, ok := fileStore[fileId]
-	if ok == false {
-		return returnErrorStatusWithMessage(env,  "given invalid file id")
-	}
-	file.Lock()
-	defer file.Unlock()
-	height, err := file.data.GetRowHeight(sheetName, row)
-	if err != nil {
-		return returnErrorStatusWithMessage(env, err.Error())
-	}
-	status := convertGoStringToErlAtom(env, "ok")
-	return C.enif_make_tuple2(env, status, convertGoFloat64ToErlFloat(env, height))
-}
-
-//export GetRowVisible
-func GetRowVisible(env *C.ErlNifEnv, argc C.int, argv *C.nif_arg_t) C.ERL_NIF_TERM {
-	fileId := extractArgAsGoString(env, argv, 0)
-	sheetName := extractArgAsGoString(env, argv, 1)
-	row := extractArgAsGoInt(env, argv, 2)
-	file, ok := fileStore[fileId]
-	if ok == false {
-		return returnErrorStatusWithMessage(env,  "given invalid file id")
-	}
-	file.Lock()
-	defer file.Unlock()
-	visible, err := file.data.GetRowVisible(sheetName, row)
-	if err != nil {
-		return returnErrorStatusWithMessage(env, err.Error())
-	}
-	status := convertGoStringToErlAtom(env, "ok")
-	return C.enif_make_tuple2(env, status, convertGoStringToErlBinary(env, strconv.FormatBool(visible)))
-}
-
-//export GetSheetIndex
-func GetSheetIndex(env *C.ErlNifEnv, argc C.int, argv *C.nif_arg_t) C.ERL_NIF_TERM {
-	fileId := extractArgAsGoString(env, argv, 0)
-	sheetName := extractArgAsGoString(env, argv, 1)
-	file, ok := fileStore[fileId]
-	if ok == false {
-		return returnErrorStatusWithMessage(env,  "given invalid file id")
-	}
-	file.Lock()
-	defer file.Unlock()
-	sheetIndex := file.data.GetSheetIndex(sheetName)
-	status := convertGoStringToErlAtom(env, "ok")
-	return C.enif_make_tuple2(env, status, convertGoIntToErlInt(env, sheetIndex))
-}
-
-//export SetSheetName
-func SetSheetName(env *C.ErlNifEnv, argc C.int, argv *C.nif_arg_t) C.ERL_NIF_TERM {
-	fileId := extractArgAsGoString(env, argv, 0)
-	oldSheetName := extractArgAsGoString(env, argv, 1)
-	newSheetName := extractArgAsGoString(env, argv, 2)
-	file, ok := fileStore[fileId]
-	if ok == false {
-		return returnErrorStatusWithMessage(env,  "given invalid file id")
-	}
-	file.Lock()
-	defer file.Unlock()
-	file.data.SetSheetName(oldSheetName, newSheetName)
-	status := convertGoStringToErlAtom(env, "ok")
-	return C.enif_make_tuple2(env, status, convertGoStringToErlBinary(env, fileId))
-}
-
 //export CloseFile
 func CloseFile(env *C.ErlNifEnv, argc C.int, argv *C.nif_arg_t) C.ERL_NIF_TERM {
 	fileId := extractArgAsGoString(env, argv, 0)
@@ -477,6 +370,131 @@ func GetSheetName(env *C.ErlNifEnv, argc C.int, argv *C.nif_arg_t) C.ERL_NIF_TER
 	sheetName := file.data.GetSheetName(sheetId)
 	status := convertGoStringToErlAtom(env, "ok")
 	return C.enif_make_tuple2(env, status, convertGoStringToErlBinary(env, sheetName))
+}
+
+//export GetColVisible
+func GetColVisible(env *C.ErlNifEnv, argc C.int, argv *C.nif_arg_t) C.ERL_NIF_TERM {
+	fileId := extractArgAsGoString(env, argv, 0)
+	sheetName := extractArgAsGoString(env, argv, 1)
+	column := extractArgAsGoString(env, argv, 2)
+	file, ok := fileStore[fileId]
+	if ok == false {
+		return returnErrorStatusWithMessage(env,  "given invalid file id")
+	}
+	file.Lock()
+	defer file.Unlock()
+	visible, err := file.data.GetColVisible(sheetName, column)
+	if err != nil {
+		return returnErrorStatusWithMessage(env, err.Error())
+	}
+	status := convertGoStringToErlAtom(env, "ok")
+	return C.enif_make_tuple2(env, status, convertGoStringToErlBinary(env, strconv.FormatBool(visible)))
+}
+
+//export GetColWidth
+func GetColWidth(env *C.ErlNifEnv, argc C.int, argv *C.nif_arg_t) C.ERL_NIF_TERM {
+	fileId := extractArgAsGoString(env, argv, 0)
+	sheetName := extractArgAsGoString(env, argv, 1)
+	column := extractArgAsGoString(env, argv, 2)
+	file, ok := fileStore[fileId]
+	if ok == false {
+		return returnErrorStatusWithMessage(env,  "given invalid file id")
+	}
+	file.Lock()
+	defer file.Unlock()
+	width, err := file.data.GetColWidth(sheetName, column)
+	if err != nil {
+		return returnErrorStatusWithMessage(env, err.Error())
+	}
+	status := convertGoStringToErlAtom(env, "ok")
+	return C.enif_make_tuple2(env, status, convertGoFloat64ToErlFloat(env, width))
+}
+
+//export GetRowHeight
+func GetRowHeight(env *C.ErlNifEnv, argc C.int, argv *C.nif_arg_t) C.ERL_NIF_TERM {
+	fileId := extractArgAsGoString(env, argv, 0)
+	sheetName := extractArgAsGoString(env, argv, 1)
+	row := extractArgAsGoInt(env, argv, 2)
+	file, ok := fileStore[fileId]
+	if ok == false {
+		return returnErrorStatusWithMessage(env,  "given invalid file id")
+	}
+	file.Lock()
+	defer file.Unlock()
+	height, err := file.data.GetRowHeight(sheetName, row)
+	if err != nil {
+		return returnErrorStatusWithMessage(env, err.Error())
+	}
+	status := convertGoStringToErlAtom(env, "ok")
+	return C.enif_make_tuple2(env, status, convertGoFloat64ToErlFloat(env, height))
+}
+
+//export GetRowVisible
+func GetRowVisible(env *C.ErlNifEnv, argc C.int, argv *C.nif_arg_t) C.ERL_NIF_TERM {
+	fileId := extractArgAsGoString(env, argv, 0)
+	sheetName := extractArgAsGoString(env, argv, 1)
+	row := extractArgAsGoInt(env, argv, 2)
+	file, ok := fileStore[fileId]
+	if ok == false {
+		return returnErrorStatusWithMessage(env,  "given invalid file id")
+	}
+	file.Lock()
+	defer file.Unlock()
+	visible, err := file.data.GetRowVisible(sheetName, row)
+	if err != nil {
+		return returnErrorStatusWithMessage(env, err.Error())
+	}
+	status := convertGoStringToErlAtom(env, "ok")
+	return C.enif_make_tuple2(env, status, convertGoStringToErlBinary(env, strconv.FormatBool(visible)))
+}
+
+//export GetSheetIndex
+func GetSheetIndex(env *C.ErlNifEnv, argc C.int, argv *C.nif_arg_t) C.ERL_NIF_TERM {
+	fileId := extractArgAsGoString(env, argv, 0)
+	sheetName := extractArgAsGoString(env, argv, 1)
+	file, ok := fileStore[fileId]
+	if ok == false {
+		return returnErrorStatusWithMessage(env,  "given invalid file id")
+	}
+	file.Lock()
+	defer file.Unlock()
+	sheetIndex := file.data.GetSheetIndex(sheetName)
+	status := convertGoStringToErlAtom(env, "ok")
+	return C.enif_make_tuple2(env, status, convertGoIntToErlInt(env, sheetIndex))
+}
+
+//export SetSheetName
+func SetSheetName(env *C.ErlNifEnv, argc C.int, argv *C.nif_arg_t) C.ERL_NIF_TERM {
+	fileId := extractArgAsGoString(env, argv, 0)
+	oldSheetName := extractArgAsGoString(env, argv, 1)
+	newSheetName := extractArgAsGoString(env, argv, 2)
+	file, ok := fileStore[fileId]
+	if ok == false {
+		return returnErrorStatusWithMessage(env,  "given invalid file id")
+	}
+	file.Lock()
+	defer file.Unlock()
+	file.data.SetSheetName(oldSheetName, newSheetName)
+	status := convertGoStringToErlAtom(env, "ok")
+	return C.enif_make_tuple2(env, status, convertGoStringToErlBinary(env, fileId))
+}
+
+//export InsertCol
+func InsertCol(env *C.ErlNifEnv, argc C.int, argv *C.nif_arg_t) C.ERL_NIF_TERM {
+	fileId := extractArgAsGoString(env, argv, 0)
+	sheetName := extractArgAsGoString(env, argv, 1)
+	column := extractArgAsGoString(env, argv, 2)
+	file, ok := fileStore[fileId]
+	if ok == false {
+		return returnErrorStatusWithMessage(env, "given invalid file id")
+	}
+	file.Lock()
+	defer file.Unlock()
+	if err := file.data.InsertCol(sheetName, column); err != nil {
+		return returnErrorStatusWithMessage(env, err.Error())
+	}
+	status := convertGoStringToErlAtom(env, "ok")
+	return C.enif_make_tuple2(env, status, convertGoStringToErlBinary(env, fileId))
 }
 
 // --------------------------- Cell ---------------------------

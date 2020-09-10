@@ -102,6 +102,9 @@ defmodule Excelizer.Native.Base do
   def set_sheet_name(file_id, old_sheet_name, new_sheet_name)
   def set_sheet_name(_, _, _), do: :erlang.nif_error(:not_loaded)
 
+  def insert_col(file_id, sheet_name, column)
+  def insert_col(_, _, _), do: :erlang.nif_error(:not_loaded)
+
   def close_file(file_id)
   def close_file(_), do: :erlang.nif_error(:not_loaded)
 

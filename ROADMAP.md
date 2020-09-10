@@ -43,7 +43,7 @@
 - [x] SetSheetName
 - [ ] SetSheetPrOptions
 - [ ] GetSheetPrOptions
-- [ ] InsertCol
+- [x] InsertCol
 - [ ] InsertRow
 - [ ] DuplicateRow
 - [ ] DuplicateRowTo

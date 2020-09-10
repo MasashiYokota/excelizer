@@ -139,4 +139,17 @@ defmodule Excelizer.Worksheet do
     {:ok, file_id} = Base.set_sheet_name(file_id, old_sheet_name, new_sheet_name)
     file_id
   end
+
+  @spec insert_col(Base.file_id(), String.t(), String.t()) :: Base.nif_resp(Base.file_id())
+  def insert_col(file_id, sheet_name, column) do
+    Base.insert_col(file_id, sheet_name, column)
+  end
+
+  @spec insert_col!(Base.file_id(), String.t(), String.t()) :: Base.file_id()
+  def insert_col!(file_id, sheet_name, column) do
+    case Base.insert_col(file_id, sheet_name, column) do
+      {:ok, file_id} -> file_id
+      {:error, err_msg} -> raise Excelizer.Exception, message: err_msg
+    end
+  end
 end
