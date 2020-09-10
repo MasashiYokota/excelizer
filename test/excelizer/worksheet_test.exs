@@ -172,4 +172,20 @@ defmodule Excelizer.WorksheetTest do
       assert resp == "given invalid file id"
     end
   end
+
+  describe "get_col_visible/3" do
+    test "get a column visibility", %{file_id: file_id} do
+      assert Worksheet.get_col_visible(file_id, "Sheet1", "A")
+    end
+
+    test "raise Error when given invalid argument", %{file_id: file_id} do
+      assert_raise Excelizer.Exception, "given invalid file id", fn ->
+        Worksheet.get_col_visible("invalid file id", "Sheet1", "A")
+      end
+
+      assert_raise Excelizer.Exception, "invalid column name \"1\"", fn ->
+        Worksheet.get_col_visible(file_id, "Sheet1", "1")
+      end
+    end
+  end
 end

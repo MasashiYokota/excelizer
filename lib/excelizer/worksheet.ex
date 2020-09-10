@@ -76,4 +76,13 @@ defmodule Excelizer.Worksheet do
       {:error, err_msg} -> raise Excelizer.Exception, message: err_msg
     end
   end
+
+  @spec get_col_visible(Base.file_id(), String.t(), String.t()) :: boolean()
+  def get_col_visible(file_id, sheet_name, column) do
+    case Base.get_col_visible(file_id, sheet_name, column) do
+      {:ok, "true"} -> true
+      {:ok, "false"} -> false
+      {:error, err_msg} -> raise Excelizer.Exception, message: err_msg
+    end
+  end
 end
