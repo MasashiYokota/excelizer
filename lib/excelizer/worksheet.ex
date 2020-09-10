@@ -133,4 +133,10 @@ defmodule Excelizer.Worksheet do
       {:error, err_msg} -> raise Excelizer.Exception, message: err_msg
     end
   end
+
+  @spec set_sheet_name(Base.file_id(), String.t(), String.t()) :: Base.file_id()
+  def set_sheet_name(file_id, old_sheet_name, new_sheet_name) do
+    {:ok, file_id} = Base.set_sheet_name(file_id, old_sheet_name, new_sheet_name)
+    file_id
+  end
 end

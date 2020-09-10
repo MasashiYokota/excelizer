@@ -298,4 +298,12 @@ defmodule Excelizer.WorksheetTest do
       assert error == "given invalid file id"
     end
   end
+
+  describe "set_sheet_name/3" do
+    test "set sheet name", %{file_id: file_id} do
+      file_id = Worksheet.set_sheet_name(file_id, "Sheet1", "new")
+      name = Worksheet.get_sheet_name!(file_id, 0)
+      assert name == "new"
+    end
+  end
 end

@@ -99,6 +99,9 @@ defmodule Excelizer.Native.Base do
   def get_sheet_index(file_id, sheet_name)
   def get_sheet_index(_, _), do: :erlang.nif_error(:not_loaded)
 
+  def set_sheet_name(file_id, old_sheet_name, new_sheet_name)
+  def set_sheet_name(_, _, _), do: :erlang.nif_error(:not_loaded)
+
   def close_file(file_id)
   def close_file(_), do: :erlang.nif_error(:not_loaded)
 

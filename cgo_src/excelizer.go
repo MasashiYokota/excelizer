@@ -319,6 +319,22 @@ func GetSheetIndex(env *C.ErlNifEnv, argc C.int, argv *C.nif_arg_t) C.ERL_NIF_TE
 	return C.enif_make_tuple2(env, status, convertGoIntToErlInt(env, sheetIndex))
 }
 
+//export SetSheetName
+func SetSheetName(env *C.ErlNifEnv, argc C.int, argv *C.nif_arg_t) C.ERL_NIF_TERM {
+	fileId := extractArgAsGoString(env, argv, 0)
+	oldSheetName := extractArgAsGoString(env, argv, 1)
+	newSheetName := extractArgAsGoString(env, argv, 2)
+	file, ok := fileStore[fileId]
+	if ok == false {
+		return returnErrorStatusWithMessage(env,  "given invalid file id")
+	}
+	file.Lock()
+	defer file.Unlock()
+	file.data.SetSheetName(oldSheetName, newSheetName)
+	status := convertGoStringToErlAtom(env, "ok")
+	return C.enif_make_tuple2(env, status, convertGoStringToErlBinary(env, fileId))
+}
+
 //export CloseFile
 func CloseFile(env *C.ErlNifEnv, argc C.int, argv *C.nif_arg_t) C.ERL_NIF_TERM {
 	fileId := extractArgAsGoString(env, argv, 0)

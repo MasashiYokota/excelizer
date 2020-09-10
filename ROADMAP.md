@@ -40,7 +40,7 @@
 - [x] GetSheetIndex
 - [ ] GetSheetMap
 - [ ] GetSheetList
-- [ ] SetSheetName
+- [x] SetSheetName
 - [ ] SetSheetPrOptions
 - [ ] GetSheetPrOptions
 - [ ] InsertCol

@@ -102,6 +102,10 @@ ERL_NIF_TERM get_sheet_index(ErlNifEnv *env, int argc, const ERL_NIF_TERM argv[]
   return GetSheetIndex(env, argc, argv);
 }
 
+ERL_NIF_TERM set_sheet_name(ErlNifEnv *env, int argc, const ERL_NIF_TERM argv[]) {
+  return SetSheetName(env, argc, argv);
+}
+
 // --------------------------- Cell ---------------------------
 ERL_NIF_TERM set_cell_value(ErlNifEnv *env, int argc, const ERL_NIF_TERM argv[]) {
   return SetCellValue(env, argc, argv);
@@ -132,6 +136,7 @@ static ErlNifFunc excelixir_nif_funcs[] = {
   {"get_row_height", 3, get_row_height},
   {"get_row_visible", 3, get_row_visible},
   {"get_sheet_index", 2, get_sheet_index},
+  {"set_sheet_name", 3, set_sheet_name},
   {"save_as", 2, save_as},
   {"save", 1, save},
   {"delete_sheet", 2, delete_sheet},
