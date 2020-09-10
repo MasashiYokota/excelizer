@@ -114,6 +114,14 @@ ERL_NIF_TERM insert_row(ErlNifEnv *env, int argc, const ERL_NIF_TERM argv[]) {
   return InsertRow(env, argc, argv);
 }
 
+ERL_NIF_TERM remove_col(ErlNifEnv *env, int argc, const ERL_NIF_TERM argv[]) {
+  return RemoveCol(env, argc, argv);
+}
+
+ERL_NIF_TERM remove_row(ErlNifEnv *env, int argc, const ERL_NIF_TERM argv[]) {
+  return RemoveRow(env, argc, argv);
+}
+
 // --------------------------- Cell ---------------------------
 ERL_NIF_TERM set_cell_value(ErlNifEnv *env, int argc, const ERL_NIF_TERM argv[]) {
   return SetCellValue(env, argc, argv);
@@ -147,6 +155,8 @@ static ErlNifFunc excelixir_nif_funcs[] = {
   {"set_sheet_name", 3, set_sheet_name},
   {"insert_col", 3, insert_col},
   {"insert_row", 3, insert_row},
+  {"remove_col", 3, remove_col},
+  {"remove_row", 3, remove_row},
   {"save_as", 2, save_as},
   {"save", 1, save},
   {"delete_sheet", 2, delete_sheet},

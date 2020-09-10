@@ -58,8 +58,8 @@
 - [ ] SearchSheet
 - [ ] ProtectSheet
 - [ ] UnprotectSheet
-- [ ] RemoveCol
-- [ ] RemoveRow
+- [x] RemoveCol
+- [x] RemoveRow
 - [ ] SetSheetRow
 - [ ] InsertPageBreak
 - [ ] RemovePageBreak

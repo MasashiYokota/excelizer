@@ -165,4 +165,30 @@ defmodule Excelizer.Worksheet do
       {:error, err_msg} -> raise Excelizer.Exception, message: err_msg
     end
   end
+
+  @spec remove_col(Base.file_id(), String.t(), String.t()) :: Base.nif_resp(Base.file_id())
+  def remove_col(file_id, sheet_name, column) do
+    Base.remove_col(file_id, sheet_name, column)
+  end
+
+  @spec remove_col!(Base.file_id(), String.t(), String.t()) :: Base.file_id()
+  def remove_col!(file_id, sheet_name, column) do
+    case Base.remove_col(file_id, sheet_name, column) do
+      {:ok, file_id} -> file_id
+      {:error, err_msg} -> raise Excelizer.Exception, message: err_msg
+    end
+  end
+
+  @spec remove_row(Base.file_id(), String.t(), integer()) :: Base.nif_resp(Base.file_id())
+  def remove_row(file_id, sheet_name, row) do
+    Base.remove_row(file_id, sheet_name, row)
+  end
+
+  @spec remove_row!(Base.file_id(), String.t(), integer()) :: Base.file_id()
+  def remove_row!(file_id, sheet_name, row) do
+    case Base.remove_row(file_id, sheet_name, row) do
+      {:ok, file_id} -> file_id
+      {:error, err_msg} -> raise Excelizer.Exception, message: err_msg
+    end
+  end
 end
