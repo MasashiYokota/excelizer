@@ -94,6 +94,10 @@ ERL_NIF_TERM get_row_height(ErlNifEnv *env, int argc, const ERL_NIF_TERM argv[])
   return GetRowHeight(env, argc, argv);
 }
 
+ERL_NIF_TERM get_row_visible(ErlNifEnv *env, int argc, const ERL_NIF_TERM argv[]) {
+  return GetRowVisible(env, argc, argv);
+}
+
 // --------------------------- Cell ---------------------------
 ERL_NIF_TERM set_cell_value(ErlNifEnv *env, int argc, const ERL_NIF_TERM argv[]) {
   return SetCellValue(env, argc, argv);
@@ -122,6 +126,7 @@ static ErlNifFunc excelixir_nif_funcs[] = {
   {"get_col_visible", 3, get_col_visible},
   {"get_col_width", 3, get_col_width},
   {"get_row_height", 3, get_row_height},
+  {"get_row_visible", 3, get_row_visible},
   {"save_as", 2, save_as},
   {"save", 1, save},
   {"delete_sheet", 2, delete_sheet},

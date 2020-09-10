@@ -111,4 +111,13 @@ defmodule Excelizer.Worksheet do
       {:error, err_msg} -> raise Excelizer.Exception, message: err_msg
     end
   end
+
+  @spec get_row_visible(Base.file_id(), String.t(), pos_integer()) :: boolean()
+  def get_row_visible(file_id, sheet_name, row) do
+    case Base.get_row_visible(file_id, sheet_name, row) do
+      {:ok, "true"} -> true
+      {:ok, "false"} -> false
+      {:error, err_msg} -> raise Excelizer.Exception, message: err_msg
+    end
+  end
 end

@@ -2,6 +2,7 @@ defmodule Excelizer.WorksheetTest do
   use ExUnit.Case
   alias Excelizer.Native.Base
   alias Excelizer.Worksheet
+  alias Excelizer.Cell
 
   setup do
     {:ok, file_id} = Base.new_file()
@@ -255,6 +256,25 @@ defmodule Excelizer.WorksheetTest do
 
       assert_raise Excelizer.Exception, "invalid row number 0", fn ->
         Worksheet.get_row_height!(file_id, "Sheet1", "A")
+      end
+    end
+  end
+
+  describe "get_row_visible/3" do
+    test "get a column visibility", %{file_id: file_id} do
+      file_id = Cell.set_cell_value!(file_id, "Sheet1", "A1", "int", 1)
+      assert Worksheet.get_row_visible(file_id, "Sheet1", 1)
+      file_id = Worksheet.set_row_visible!(file_id, "Sheet1", 1, false)
+      refute Worksheet.get_row_visible(file_id, "Sheet1", 1)
+    end
+
+    test "raise Error when given invalid argument", %{file_id: file_id} do
+      assert_raise Excelizer.Exception, "given invalid file id", fn ->
+        Worksheet.get_row_visible("invalid file id", "Sheet1", 1)
+      end
+
+      assert_raise Excelizer.Exception, "invalid row number 0", fn ->
+        Worksheet.get_row_visible(file_id, "Sheet1", "A")
       end
     end
   end
