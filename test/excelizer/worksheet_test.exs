@@ -188,4 +188,39 @@ defmodule Excelizer.WorksheetTest do
       end
     end
   end
+
+  describe "get_col_width/3" do
+    test "return {:ok, width} of given valid sheet_name and column", %{file_id: file_id} do
+      {status, width} = Worksheet.get_col_width(file_id, "Sheet1", "A")
+      assert status == :ok
+      assert width == 64.0
+    end
+
+    test "return {:error, error_msg} of given invalid sheet_name and column", %{file_id: file_id} do
+      {status, width} = Worksheet.get_col_width("invalid file_id", "Sheet1", "A")
+      assert status == :error
+      assert width == "given invalid file id"
+
+      {status, width} = Worksheet.get_col_width(file_id, "Sheet1", "1")
+      assert status == :error
+      assert width == "invalid column name \"1\""
+    end
+  end
+
+  describe "get_col_width!/3" do
+    test "return width of given valid sheet_name and column", %{file_id: file_id} do
+      width = Worksheet.get_col_width!(file_id, "Sheet1", "A")
+      assert width == 64.0
+    end
+
+    test "raise error when given invalid sheet_name and column", %{file_id: file_id} do
+      assert_raise Excelizer.Exception, "given invalid file id", fn ->
+        Worksheet.get_col_width!("invalid file id", "Sheet1", "A")
+      end
+
+      assert_raise Excelizer.Exception, "invalid column name \"1\"", fn ->
+        Worksheet.get_col_width!(file_id, "Sheet1", "1")
+      end
+    end
+  end
 end

@@ -247,6 +247,25 @@ func GetColVisible(env *C.ErlNifEnv, argc C.int, argv *C.nif_arg_t) C.ERL_NIF_TE
 	return C.enif_make_tuple2(env, status, convertGoStringToErlBinary(env, strconv.FormatBool(visible)))
 }
 
+//export GetColWidth
+func GetColWidth(env *C.ErlNifEnv, argc C.int, argv *C.nif_arg_t) C.ERL_NIF_TERM {
+	fileId := extractArgAsGoString(env, argv, 0)
+	sheetName := extractArgAsGoString(env, argv, 1)
+	column := extractArgAsGoString(env, argv, 2)
+	file, ok := fileStore[fileId]
+	if ok == false {
+		return returnErrorStatusWithMessage(env,  "given invalid file id")
+	}
+	file.Lock()
+	defer file.Unlock()
+	width, err := file.data.GetColWidth(sheetName, column);
+	if err != nil {
+		return returnErrorStatusWithMessage(env, err.Error())
+	}
+	status := convertGoStringToErlAtom(env, "ok")
+	return C.enif_make_tuple2(env, status, convertGoFloat64ToErlFloat(env, width))
+}
+
 //export CloseFile
 func CloseFile(env *C.ErlNifEnv, argc C.int, argv *C.nif_arg_t) C.ERL_NIF_TERM {
 	fileId := extractArgAsGoString(env, argv, 0)
@@ -544,6 +563,10 @@ func convertGoStringToErlAtom(env *C.ErlNifEnv, message string) C.ERL_NIF_TERM {
 
 func convertGoIntToErlInt(env *C.ErlNifEnv, value int) C.ERL_NIF_TERM {
 	return C.enif_make_int64(env, C.ErlNifSInt64(value))
+}
+
+func convertGoFloat64ToErlFloat(env *C.ErlNifEnv, value float64) C.ERL_NIF_TERM {
+	return C.enif_make_double(env, C.double(value))
 }
 
 func convertErlNumberToGoFloat64(env *C.ErlNifEnv, erlValue C.ERL_NIF_TERM) (float64, error) {

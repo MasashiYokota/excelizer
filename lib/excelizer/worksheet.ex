@@ -85,4 +85,17 @@ defmodule Excelizer.Worksheet do
       {:error, err_msg} -> raise Excelizer.Exception, message: err_msg
     end
   end
+
+  @spec get_col_width(Base.file_id(), String.t(), String.t()) :: Base.nif_resp(float)
+  def get_col_width(file_id, sheet_name, column) do
+    Base.get_col_width(file_id, sheet_name, column)
+  end
+
+  @spec get_col_width!(Base.file_id(), String.t(), String.t()) :: float
+  def get_col_width!(file_id, sheet_name, column) do
+    case Base.get_col_width(file_id, sheet_name, column) do
+      {:ok, width} -> width
+      {:error, err_msg} -> raise Excelizer.Exception, message: err_msg
+    end
+  end
 end
