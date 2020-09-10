@@ -123,6 +123,12 @@ defmodule Excelizer.Native.Base do
   def set_cell_style(file_id, sheet_name, hcell, vcell, style)
   def set_cell_style(_, _, _, _, _), do: :erlang.nif_error(:not_loaded)
 
+  def merge_cell(file_id, sheet_name, hcell, vcell)
+  def merge_cell(_, _, _, _), do: :erlang.nif_error(:not_loaded)
+
+  def unmerge_cell(file_id, sheet_name, hcell, vcell)
+  def unmerge_cell(_, _, _, _), do: :erlang.nif_error(:not_loaded)
+
   def set_row(file_id, sheet_name, column, rows)
   def set_row(_, _, _, _), do: :erlang.nif_error(:not_loaded)
 

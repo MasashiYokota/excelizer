@@ -189,4 +189,80 @@ defmodule Excelizer.CellTest do
       end
     end
   end
+
+  describe "merge_cell/5" do
+    test "merge cells" do
+      {:ok, file_id} = Base.new_file()
+
+      {status, resp} = Cell.merge_cell(file_id, "Sheet1", "A1", "A2")
+
+      assert status == :ok
+      assert resp == file_id
+
+      Base.close_file(file_id)
+    end
+
+    test "failed given invalid file_id" do
+      {status, resp} = Cell.merge_cell("invalid file id", "Sheet1", "A1", "A2")
+
+      assert status == :error
+      assert resp == "given invalid file id"
+    end
+  end
+
+  describe "merge_cell!/5" do
+    test "merges cells" do
+      {:ok, file_id} = Base.new_file()
+
+      resp = Cell.merge_cell!(file_id, "Sheet1", "A1", "A2")
+
+      assert resp == file_id
+
+      Base.close_file(file_id)
+    end
+
+    test "failed given invalid file_id" do
+      assert_raise Excelizer.Exception, "given invalid file id", fn ->
+        Cell.merge_cell!("invalid file id", "Sheet1", "A1", "A2")
+      end
+    end
+  end
+
+  describe "unmerge_cell/5" do
+    test "unmerge cells" do
+      {:ok, file_id} = Base.new_file()
+
+      {status, resp} = Cell.unmerge_cell(file_id, "Sheet1", "A1", "A2")
+
+      assert status == :ok
+      assert resp == file_id
+
+      Base.close_file(file_id)
+    end
+
+    test "failed given invalid file_id" do
+      {status, resp} = Cell.unmerge_cell("invalid file id", "Sheet1", "A1", "A2")
+
+      assert status == :error
+      assert resp == "given invalid file id"
+    end
+  end
+
+  describe "unmerge_cell!/5" do
+    test "unmerges cells" do
+      {:ok, file_id} = Base.new_file()
+
+      resp = Cell.unmerge_cell!(file_id, "Sheet1", "A1", "A2")
+
+      assert resp == file_id
+
+      Base.close_file(file_id)
+    end
+
+    test "failed given invalid file_id" do
+      assert_raise Excelizer.Exception, "given invalid file id", fn ->
+        Cell.unmerge_cell!("invalid file id", "Sheet1", "A1", "A2")
+      end
+    end
+  end
 end

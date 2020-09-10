@@ -77,8 +77,8 @@
 - [x] GetRows
 - [ ] GetCellHyperLink
 - [ ] GetCellStyle
-- [ ] MergeCell
-- [ ] UnmergeCell
+- [x] MergeCell
+- [x] UnmergeCell
 - [ ] GetMergeCells
 - [ ] AddComment
 - [ ] GetComments

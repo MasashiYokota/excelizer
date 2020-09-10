@@ -41,6 +41,34 @@ defmodule Excelizer.Cell do
     end
   end
 
+  @spec merge_cell(Base.file_id(), String.t(), String.t(), String.t()) ::
+          Base.nif_resp(Base.file_id())
+  def merge_cell(file_id, sheet_name, hcell, vcell),
+    do: Base.merge_cell(file_id, sheet_name, hcell, vcell)
+
+  @spec merge_cell!(Base.file_id(), String.t(), String.t(), String.t()) ::
+          Base.file_id()
+  def merge_cell!(file_id, sheet_name, hcell, vcell) do
+    case Base.merge_cell(file_id, sheet_name, hcell, vcell) do
+      {:ok, file_id} -> file_id
+      {:error, err_msg} -> raise Excelizer.Exception, message: err_msg
+    end
+  end
+
+  @spec unmerge_cell(Base.file_id(), String.t(), String.t(), String.t()) ::
+          Base.nif_resp(Base.file_id())
+  def unmerge_cell(file_id, sheet_name, hcell, vcell),
+    do: Base.unmerge_cell(file_id, sheet_name, hcell, vcell)
+
+  @spec unmerge_cell!(Base.file_id(), String.t(), String.t(), String.t()) ::
+          Base.file_id()
+  def unmerge_cell!(file_id, sheet_name, hcell, vcell) do
+    case Base.unmerge_cell(file_id, sheet_name, hcell, vcell) do
+      {:ok, file_id} -> file_id
+      {:error, err_msg} -> raise Excelizer.Exception, message: err_msg
+    end
+  end
+
   defp convert_according_to_value_type(value, value_type) when value_type in ["boolean", "nil"],
     do: to_string(value)
 

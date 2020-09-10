@@ -598,6 +598,46 @@ func SetCellStyle(env *C.ErlNifEnv, argc C.int, argv *C.nif_arg_t) C.ERL_NIF_TER
 	return C.enif_make_tuple2(env, status, convertGoStringToErlBinary(env, fileId))
 }
 
+//export MergeCell
+func MergeCell(env *C.ErlNifEnv, argc C.int, argv *C.nif_arg_t) C.ERL_NIF_TERM {
+	fileId := extractArgAsGoString(env, argv, 0)
+	sheetName := extractArgAsGoString(env, argv, 1)
+	vcell := extractArgAsGoString(env, argv, 2)
+	hcell := extractArgAsGoString(env, argv, 3)
+	file, ok := fileStore[fileId]
+	if ok == false {
+		return returnErrorStatusWithMessage(env, "given invalid file id")
+	}
+	file.Lock()
+	defer file.Unlock()
+	err := file.data.MergeCell(sheetName, vcell, hcell)
+	if err != nil {
+		return returnErrorStatusWithMessage(env, err.Error())
+	}
+	status := convertGoStringToErlAtom(env, "ok")
+	return C.enif_make_tuple2(env, status, convertGoStringToErlBinary(env, fileId))
+}
+
+//export UnmergeCell
+func UnmergeCell(env *C.ErlNifEnv, argc C.int, argv *C.nif_arg_t) C.ERL_NIF_TERM {
+	fileId := extractArgAsGoString(env, argv, 0)
+	sheetName := extractArgAsGoString(env, argv, 1)
+	vcell := extractArgAsGoString(env, argv, 2)
+	hcell := extractArgAsGoString(env, argv, 3)
+	file, ok := fileStore[fileId]
+	if ok == false {
+		return returnErrorStatusWithMessage(env, "given invalid file id")
+	}
+	file.Lock()
+	defer file.Unlock()
+	err := file.data.UnmergeCell(sheetName, vcell, hcell)
+	if err != nil {
+		return returnErrorStatusWithMessage(env, err.Error())
+	}
+	status := convertGoStringToErlAtom(env, "ok")
+	return C.enif_make_tuple2(env, status, convertGoStringToErlBinary(env, fileId))
+}
+
 // --------------------------- StreamWrite ---------------------------
 
 //export SetRow
