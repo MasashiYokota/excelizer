@@ -73,14 +73,14 @@ defmodule Excelizer.Workbook do
     end
   end
 
-  @spec set_active_sheet_visible(Base.file_id(), String.t(), boolean) ::
+  @spec set_sheet_visible(Base.file_id(), String.t(), boolean) ::
           Base.nif_resp(Base.file_id())
-  def set_active_sheet_visible(file_id, sheet_name, visible),
-    do: Base.set_active_sheet_visible(file_id, sheet_name, to_string(visible))
+  def set_sheet_visible(file_id, sheet_name, visible),
+    do: Base.set_sheet_visible(file_id, sheet_name, to_string(visible))
 
-  @spec set_active_sheet_visible!(Base.file_id(), String.t(), boolean) :: Base.file_id()
-  def set_active_sheet_visible!(file_id, sheet_name, visible) do
-    case Base.set_active_sheet_visible(file_id, sheet_name, to_string(visible)) do
+  @spec set_sheet_visible!(Base.file_id(), String.t(), boolean) :: Base.file_id()
+  def set_sheet_visible!(file_id, sheet_name, visible) do
+    case Base.set_sheet_visible(file_id, sheet_name, to_string(visible)) do
       {:ok, sheet_id} -> sheet_id
       {:error, err} -> raise Excelizer.Exception, message: err
     end

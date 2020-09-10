@@ -186,8 +186,8 @@ func GetActiveSheetIndex(env *C.ErlNifEnv, argc C.int, argv *C.nif_arg_t) C.ERL_
 	return C.enif_make_tuple2(env, status, erlActiveSheetIndexTerm)
 }
 
-//export SetActiveSheetVisible
-func SetActiveSheetVisible(env *C.ErlNifEnv, argc C.int, argv *C.nif_arg_t) C.ERL_NIF_TERM {
+//export SetSheetVisible
+func SetSheetVisible(env *C.ErlNifEnv, argc C.int, argv *C.nif_arg_t) C.ERL_NIF_TERM {
 	fileId := extractArgAsGoString(env, argv, 0)
 	sheetName := extractArgAsGoString(env, argv, 1)
 	value := extractArgAsGoString(env, argv, 2)

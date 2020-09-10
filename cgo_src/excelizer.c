@@ -41,8 +41,8 @@ ERL_NIF_TERM get_active_sheet_index(ErlNifEnv *env, int argc, const ERL_NIF_TERM
   return GetActiveSheetIndex(env, argc, argv);
 }
 
-ERL_NIF_TERM set_active_sheet_visible(ErlNifEnv *env, int argc, const ERL_NIF_TERM argv[]) {
-  return SetActiveSheetVisible(env, argc, argv);
+ERL_NIF_TERM set_sheet_visible(ErlNifEnv *env, int argc, const ERL_NIF_TERM argv[]) {
+  return SetSheetVisible(env, argc, argv);
 }
 
 ERL_NIF_TERM close_file(ErlNifEnv *env, int argc, const ERL_NIF_TERM argv[]) {
@@ -109,7 +109,7 @@ static ErlNifFunc excelixir_nif_funcs[] = {
   {"copy_sheet", 3, copy_sheet},
   {"set_sheet_background", 3, set_sheet_background},
   {"get_active_sheet_index", 1, get_active_sheet_index},
-  {"set_active_sheet_visible", 3, set_active_sheet_visible},
+  {"set_sheet_visible", 3, set_sheet_visible},
   {"close_file", 1, close_file},
   {"set_cell_value", 5, set_cell_value},
   {"set_cell_style", 5, set_cell_style},

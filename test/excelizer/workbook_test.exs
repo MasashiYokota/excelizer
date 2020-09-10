@@ -199,29 +199,29 @@ defmodule Excelizer.WorkbookTest do
     end
   end
 
-  describe "set_active_sheet_visible/3" do
+  describe "set_sheet_visible/3" do
     test "makes a sheet visible", %{file_id: file_id} do
-      {status, file_id} = Workbook.set_active_sheet_visible(file_id, "Sheet1", false)
+      {status, file_id} = Workbook.set_sheet_visible(file_id, "Sheet1", false)
       assert status == :ok
       assert is_binary(file_id)
     end
 
     test "fails to set make a sheet visible" do
-      {status, resp} = Workbook.set_active_sheet_visible("invalid file id", "Sheet1", false)
+      {status, resp} = Workbook.set_sheet_visible("invalid file id", "Sheet1", false)
       assert status == :error
       assert resp == "given invalid file id"
     end
   end
 
-  describe "set_active_sheet_visible!/3" do
+  describe "set_sheet_visible!/3" do
     test "makes a sheet visible", %{file_id: file_id} do
-      file_id = Workbook.set_active_sheet_visible!(file_id, "Sheet1", false)
+      file_id = Workbook.set_sheet_visible!(file_id, "Sheet1", false)
       assert is_binary(file_id)
     end
 
     test "fails to make a sheet visible" do
       assert_raise Excelizer.Exception, "given invalid file id", fn ->
-        Workbook.set_active_sheet_visible!("invalid file id", "Sheet1", false)
+        Workbook.set_sheet_visible!("invalid file id", "Sheet1", false)
       end
     end
   end
