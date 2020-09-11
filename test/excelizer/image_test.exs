@@ -1,6 +1,7 @@
 defmodule Excelizer.ImageTest do
   use ExUnit.Case
   alias Excelizer.Image
+  alias Excelizer.Image.Format
   alias Excelizer.Native.Base
 
   setup do
@@ -16,14 +17,14 @@ defmodule Excelizer.ImageTest do
   describe "add_picture/5" do
     test "add picture and returns file_id", %{file_id: file_id} do
       path = Path.join([File.cwd!(), "test", "assets", "test_image.jpeg"])
-      {status, resp} = Image.add_picture(file_id, "Sheet1", "A1", path, %{})
+      {status, resp} = Image.add_picture(file_id, "Sheet1", "A1", path, %Format{})
       assert status == :ok
       assert resp == file_id
     end
 
     test "return error when given invalid picture path", %{file_id: file_id} do
       path = Path.join([File.cwd!(), "test", "assets", "invalid_data.jpeg"])
-      {status, resp} = Image.add_picture(file_id, "Sheet1", "A1", path, %{})
+      {status, resp} = Image.add_picture(file_id, "Sheet1", "A1", path, %Format{})
       assert status == :error
       assert String.contains?(resp, "no such file or directory")
     end
@@ -32,7 +33,7 @@ defmodule Excelizer.ImageTest do
   describe "add_picture!/5" do
     test "add picture and returns file_id", %{file_id: file_id} do
       path = Path.join([File.cwd!(), "test", "assets", "test_image.jpeg"])
-      resp = Image.add_picture!(file_id, "Sheet1", "A1", path, %{})
+      resp = Image.add_picture!(file_id, "Sheet1", "A1", path, %Format{})
       assert resp == file_id
     end
 
@@ -40,7 +41,7 @@ defmodule Excelizer.ImageTest do
       path = Path.join([File.cwd!(), "test", "assets", "invalid_data.jpeg"])
 
       assert_raise Excelizer.Exception, "stat #{path}: no such file or directory", fn ->
-        Image.add_picture!(file_id, "Sheet1", "A1", path, %{})
+        Image.add_picture!(file_id, "Sheet1", "A1", path, %Format{})
       end
     end
   end
@@ -55,7 +56,7 @@ defmodule Excelizer.ImageTest do
           file_id,
           "Sheet1",
           "A1",
-          %{},
+          %Format{},
           "test_image.jpeg",
           ".jpeg",
           data
@@ -67,7 +68,15 @@ defmodule Excelizer.ImageTest do
 
     test "return error when given invalid picture path", %{file_id: file_id} do
       {status, resp} =
-        Image.add_picture_from_bytes(file_id, "Sheet1", "A1", %{}, "test image", "txt", "xxx")
+        Image.add_picture_from_bytes(
+          file_id,
+          "Sheet1",
+          "A1",
+          %Format{},
+          "test image",
+          "txt",
+          "xxx"
+        )
 
       assert status == :error
       assert String.contains?(resp, "unsupported image extension")
@@ -84,7 +93,7 @@ defmodule Excelizer.ImageTest do
           file_id,
           "Sheet1",
           "A1",
-          %{},
+          %Format{},
           "test_image.jpeg",
           ".jpeg",
           data
@@ -99,7 +108,7 @@ defmodule Excelizer.ImageTest do
           file_id,
           "Sheet1",
           "A1",
-          %{},
+          %Format{},
           "test_image.jpeg",
           ".txt",
           "xxx"

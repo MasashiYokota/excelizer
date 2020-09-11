@@ -4,9 +4,9 @@ defmodule ExcelizerTest do
 
   describe "read_sheet/2" do
     test "read an excel file" do
-      {status, results} = Excelizer.read_sheet("tmp/test.xlsx", "Sheet1")
+      {status, results} = Excelizer.read_sheet("test/assets/test.xlsx", "Sheet1")
       assert status == :ok
-      assert results == [["12/31/99 00:00"]]
+      assert results == [["test"]]
     end
 
     test "fails to read a file given invalid filename" do
@@ -18,8 +18,8 @@ defmodule ExcelizerTest do
 
   describe "read_sheet!/2" do
     test "read an excel file" do
-      results = Excelizer.read_sheet!("tmp/test.xlsx", "Sheet1")
-      assert results == [["12/31/99 00:00"]]
+      results = Excelizer.read_sheet!("test/assets/test.xlsx", "Sheet1")
+      assert results == [["test"]]
     end
 
     test "fails to read a file given invalid filename" do
@@ -39,6 +39,7 @@ defmodule ExcelizerTest do
           Cell.set_cell_value!(file_id, "Sheet1", "A1", "datetime", ~D[2020-05-23])
           Cell.set_cell_value!(file_id, "Sheet1", "A1", "nil", nil)
           Cell.set_cell_value!(file_id, "Sheet1", "A1", "int", 1)
+
           {:ok, file_id}
         end)
 
