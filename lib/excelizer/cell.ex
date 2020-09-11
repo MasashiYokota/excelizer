@@ -3,6 +3,7 @@ defmodule Excelizer.Cell do
     This is a module to tread excel cell
   """
   alias Excelizer.Native.Base
+  alias Excelizer.Style.CellStyle
   @type value :: String.t() | number | boolean | nil
 
   @acceptable_value_types ["int", "float", "string", "boolean", "datetime", "nil"]
@@ -27,15 +28,15 @@ defmodule Excelizer.Cell do
     end
   end
 
-  @spec set_cell_style(Base.file_id(), String.t(), String.t(), String.t(), map) ::
+  @spec set_cell_style(Base.file_id(), String.t(), String.t(), String.t(), CellStyle.t()) ::
           Base.nif_resp(Base.file_id())
   def set_cell_style(file_id, sheet_name, hcell, vcell, style),
-    do: Base.set_cell_style(file_id, sheet_name, hcell, vcell, Poison.encode!(style))
+    do: Base.set_cell_style(file_id, sheet_name, hcell, vcell, CellStyle.convert_to_json(style))
 
-  @spec set_cell_style!(Base.file_id(), String.t(), String.t(), String.t(), map) ::
+  @spec set_cell_style!(Base.file_id(), String.t(), String.t(), String.t(), CellStyle.t()) ::
           Base.file_id()
   def set_cell_style!(file_id, sheet_name, hcell, vcell, style) do
-    case Base.set_cell_style(file_id, sheet_name, hcell, vcell, Poison.encode!(style)) do
+    case Base.set_cell_style(file_id, sheet_name, hcell, vcell, CellStyle.convert_to_json(style)) do
       {:ok, file_id} -> file_id
       {:error, err_msg} -> raise Excelizer.Exception, message: err_msg
     end

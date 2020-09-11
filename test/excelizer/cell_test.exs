@@ -2,6 +2,7 @@ defmodule Excelizer.CellTest do
   use ExUnit.Case
   alias Excelizer.Cell
   alias Excelizer.Native.Base
+  alias Excelizer.Style.CellStyle
 
   describe "set_cell_value/4" do
     test "sets a string value to a target cell" do
@@ -145,10 +146,7 @@ defmodule Excelizer.CellTest do
     test "set a style" do
       {:ok, file_id} = Base.new_file()
 
-      {status, resp} =
-        Cell.set_cell_style(file_id, "Sheet1", "A1", "A2", %{
-          "fill" => %{"type" => "gradient", "color" => ["#FFFFFF", "#E0EBF5"], "shading" => 1}
-        })
+      {status, resp} = Cell.set_cell_style(file_id, "Sheet1", "A1", "A2", %CellStyle{})
 
       assert status == :ok
       assert resp == file_id
@@ -157,10 +155,7 @@ defmodule Excelizer.CellTest do
     end
 
     test "failed given invalid file_id" do
-      {status, resp} =
-        Cell.set_cell_style("invalid file id", "Sheet1", "A1", "A2", %{
-          "fill" => %{"type" => "gradient", "color" => ["#FFFFFF", "#E0EBF5"], "shading" => 1}
-        })
+      {status, resp} = Cell.set_cell_style("invalid file id", "Sheet1", "A1", "A2", %CellStyle{})
 
       assert status == :error
       assert resp == "given invalid file id"
@@ -171,10 +166,7 @@ defmodule Excelizer.CellTest do
     test "set a style" do
       {:ok, file_id} = Base.new_file()
 
-      resp =
-        Cell.set_cell_style!(file_id, "Sheet1", "A1", "A2", %{
-          "fill" => %{"type" => "gradient", "color" => ["#FFFFFF", "#E0EBF5"], "shading" => 1}
-        })
+      resp = Cell.set_cell_style!(file_id, "Sheet1", "A1", "A2", %CellStyle{})
 
       assert resp == file_id
 
@@ -183,9 +175,7 @@ defmodule Excelizer.CellTest do
 
     test "failed given invalid file_id" do
       assert_raise Excelizer.Exception, "given invalid file id", fn ->
-        Cell.set_cell_style!("invalid file id", "Sheet1", "A1", "A2", %{
-          "fill" => %{"type" => "gradient", "color" => ["#FFFFFF", "#E0EBF5"], "shading" => 1}
-        })
+        Cell.set_cell_style!("invalid file id", "Sheet1", "A1", "A2", %CellStyle{})
       end
     end
   end
