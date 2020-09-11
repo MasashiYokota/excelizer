@@ -91,8 +91,8 @@
 - [ ] DeleteChart
 
 ### Image
-- [ ] AddPicture
-- [ ] AddPictureFromBytes
+- [x] AddPicture
+- [x] AddPictureFromBytes
 - [ ] GetPicture
 - [ ] DeletePicture
 

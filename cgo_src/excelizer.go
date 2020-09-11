@@ -18,6 +18,9 @@ static ERL_NIF_TERM get_arg(ERL_NIF_TERM* arg, int index) {
 import "C"
 import (
 	"errors"
+	_ "image/gif"
+	_ "image/jpeg"
+	_ "image/png"
 	"strconv"
 	"sync"
 	"time"
@@ -638,6 +641,50 @@ func UnmergeCell(env *C.ErlNifEnv, argc C.int, argv *C.nif_arg_t) C.ERL_NIF_TERM
 	return C.enif_make_tuple2(env, status, convertGoStringToErlBinary(env, fileId))
 }
 
+// --------------------------- Image ---------------------------
+
+//export AddPicture
+func AddPicture(env *C.ErlNifEnv, argc C.int, argv *C.nif_arg_t) C.ERL_NIF_TERM {
+	fileId := extractArgAsGoString(env, argv, 0)
+	sheetName := extractArgAsGoString(env, argv, 1)
+	cell := extractArgAsGoString(env, argv, 2)
+	picturePath := extractArgAsGoString(env, argv, 3)
+	format := extractArgAsGoString(env, argv, 4)
+	file, ok := fileStore[fileId]
+	if ok == false {
+		return returnErrorStatusWithMessage(env, "given invalid file id")
+	}
+	file.Lock()
+	defer file.Unlock()
+	if err := file.data.AddPicture(sheetName, cell, picturePath, format); err != nil {
+		return returnErrorStatusWithMessage(env, err.Error())
+	}
+	status := convertGoStringToErlAtom(env, "ok")
+	return C.enif_make_tuple2(env, status, convertGoStringToErlBinary(env, fileId))
+}
+
+//export AddPictureFromBytes
+func AddPictureFromBytes(env *C.ErlNifEnv, argc C.int, argv *C.nif_arg_t) C.ERL_NIF_TERM {
+	fileId := extractArgAsGoString(env, argv, 0)
+	sheetName := extractArgAsGoString(env, argv, 1)
+	cell := extractArgAsGoString(env, argv, 2)
+	format := extractArgAsGoString(env, argv, 3)
+	name := extractArgAsGoString(env, argv, 4)
+	extension := extractArgAsGoString(env, argv, 5)
+	bytes := extractArgAsGoBytes(env, argv, 6)
+	file, ok := fileStore[fileId]
+	if ok == false {
+		return returnErrorStatusWithMessage(env, "given invalid file id")
+	}
+	file.Lock()
+	defer file.Unlock()
+	if err := file.data.AddPictureFromBytes(sheetName, cell, format, name, extension, bytes); err != nil {
+		return returnErrorStatusWithMessage(env, err.Error())
+	}
+	status := convertGoStringToErlAtom(env, "ok")
+	return C.enif_make_tuple2(env, status, convertGoStringToErlBinary(env, fileId))
+}
+
 // --------------------------- StreamWrite ---------------------------
 
 //export SetRow
@@ -764,6 +811,12 @@ func convertErlBinaryToGoString(term C.ErlNifBinary) string {
 	return C.GoStringN(c, C.int(term.size))
 }
 
+// ref: https://stackoverflow.com/questions/59827026/cgo-convert-go-string-to-c-uchar
+func convertErlBinaryToGoBytes(term C.ErlNifBinary) []byte {
+	c := unsafe.Pointer(term.data)
+	return C.GoBytes(c, C.int(term.size))
+}
+
 func convertErlTermToColumnValue(env *C.ErlNifEnv, erlValueTerm C.ERL_NIF_TERM, valueType string) (interface{}, error) {
 	if valueType == "string" && C.enif_is_binary(env, erlValueTerm) == 1 {
 		var erlValue C.ErlNifBinary;
@@ -818,6 +871,13 @@ func extractArgAsGoString(env *C.ErlNifEnv, argv *C.nif_arg_t, argIndex int) str
 	erlValueTerm := C.get_arg(argv, C.int(argIndex))
 	C.enif_inspect_binary(env, erlValueTerm, &erlValue);
 	return convertErlBinaryToGoString(erlValue)
+}
+
+func extractArgAsGoBytes(env *C.ErlNifEnv, argv *C.nif_arg_t, argIndex int) []byte {
+	var erlValue C.ErlNifBinary;
+	erlValueTerm := C.get_arg(argv, C.int(argIndex))
+	C.enif_inspect_binary(env, erlValueTerm, &erlValue);
+	return convertErlBinaryToGoBytes(erlValue)
 }
 
 func extractArgAsGoBoolean(env *C.ErlNifEnv, argv *C.nif_arg_t, argIndex int) bool {

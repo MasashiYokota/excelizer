@@ -139,6 +139,15 @@ ERL_NIF_TERM unmerge_cell(ErlNifEnv *env, int argc, const ERL_NIF_TERM argv[]) {
   return UnmergeCell(env, argc, argv);
 }
 
+// --------------------------- Image ---------------------------
+ERL_NIF_TERM add_picture(ErlNifEnv *env, int argc, const ERL_NIF_TERM argv[]) {
+  return AddPicture(env, argc, argv);
+}
+
+ERL_NIF_TERM add_picture_from_bytes(ErlNifEnv *env, int argc, const ERL_NIF_TERM argv[]) {
+  return AddPictureFromBytes(env, argc, argv);
+}
+
 // --------------------------- StreamWrite ---------------------------
 ERL_NIF_TERM set_row(ErlNifEnv *env, int argc, const ERL_NIF_TERM argv[]) {
   return enif_schedule_nif(env, "SetRow", ERL_NIF_DIRTY_JOB_CPU_BOUND, SetRow, argc, argv);
@@ -178,6 +187,8 @@ static ErlNifFunc excelixir_nif_funcs[] = {
   {"set_cell_style", 5, set_cell_style},
   {"merge_cell", 4, merge_cell},
   {"unmerge_cell", 4, unmerge_cell},
+  {"add_picture", 5, add_picture},
+  {"add_picture_from_bytes", 7, add_picture_from_bytes},
   {"set_row", 4, set_row},
 };
 
