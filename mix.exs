@@ -1,6 +1,10 @@
 defmodule Excelizer.MixProject do
   use Mix.Project
 
+  @description """
+    Excel reader and writer library powered by Excelize (https://github.com/360EntSecGroup-Skylar/excelize) via NIF.
+  """
+
   def project do
     [
       app: :excelizer,
@@ -8,6 +12,7 @@ defmodule Excelizer.MixProject do
       elixir: "~> 1.10",
       start_permanent: Mix.env() == :prod,
       deps: deps(),
+      description: @description,
       make_executable: "make",
       package: package(),
       compilers: [:elixir_make] ++ Mix.compilers(),
@@ -28,7 +33,7 @@ defmodule Excelizer.MixProject do
   defp package do
     [
       maintainers: ["Masashi Yokota"],
-      files: ["lib", "LICENSE", "mix.exs", "README.md", "go_src/*.go", "Makefile"],
+      files: ["lib", "LICENSE", "mix.exs", "README.md", "cgo_src", "Makefile"],
       licenses: ["MIT"],
       links: %{
         GitHub: "https://github.com/MasashiYokota/excelizer"
