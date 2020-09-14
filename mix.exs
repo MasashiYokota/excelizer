@@ -10,7 +10,11 @@ defmodule Excelizer.MixProject do
       deps: deps(),
       make_executable: "make",
       package: package(),
-      compilers: [:elixir_make] ++ Mix.compilers()
+      compilers: [:elixir_make] ++ Mix.compilers(),
+      docs: [
+        main: "Excelizer", # The main page in the docs
+        extras: ["README.md"]
+      ]
     ]
   end
 
@@ -31,6 +35,7 @@ defmodule Excelizer.MixProject do
   defp deps do
     [
       {:elixir_make, "~> 0.4", runtime: false},
+      {:ex_doc, "~> 0.22", only: :dev, runtime: false},
       {:dialyxir, "~> 1.0", only: [:dev], runtime: false},
       {:poison, "~> 4.0"}
     ]
