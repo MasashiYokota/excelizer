@@ -1,5 +1,5 @@
 all:
-	mkdir -p priv && cd cgo_src && make excelizer_nif.so && cd .. && cp cgo_src/excelizer_nif.so priv
+	mkdir -p priv && cd cgo_src && make clean && make excelizer_nif.so && cd .. && cp cgo_src/excelizer_nif.so priv
 
 format:
 	astyle -s2 -n --style=google cgo_src/*.c
