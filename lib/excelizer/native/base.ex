@@ -129,6 +129,12 @@ defmodule Excelizer.Native.Base do
   def unmerge_cell(file_id, sheet_name, hcell, vcell)
   def unmerge_cell(_, _, _, _), do: :erlang.nif_error(:not_loaded)
 
+  def set_cell_formula(file_id, sheet_name, axis, formula)
+  def set_cell_formula(_, _, _, _), do: :erlang.nif_error(:not_loaded)
+
+  def get_cell_formula(file_id, sheet_name, axis)
+  def get_cell_formula(_, _, _), do: :erlang.nif_error(:not_loaded)
+
   def add_picture(file_id, sheet_name, cell, picture_path, format)
   def add_picture(_, _, _, _, _), do: :erlang.nif_error(:not_loaded)
 

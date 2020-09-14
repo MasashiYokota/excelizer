@@ -82,8 +82,8 @@
 - [ ] GetMergeCells
 - [ ] AddComment
 - [ ] GetComments
-- [ ] SetCellFormula
-- [ ] GetCellFormula
+- [x] SetCellFormula
+- [x] GetCellFormula
 
 ### Graph
 - [ ] AddChart

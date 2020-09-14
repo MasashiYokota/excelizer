@@ -255,4 +255,83 @@ defmodule Excelizer.CellTest do
       end
     end
   end
+
+  describe "set_cell_formula/5" do
+    test "unmerge cells" do
+      {:ok, file_id} = Base.new_file()
+
+      {status, resp} = Cell.set_cell_formula(file_id, "Sheet1", "A1", "SUM(Sheet1!D2,Sheet1!D11)")
+
+      assert status == :ok
+      assert resp == file_id
+
+      Base.close_file(file_id)
+    end
+
+    test "failed given invalid file_id" do
+      {status, resp} =
+        Cell.set_cell_formula("invalid file id", "Sheet1", "A1", "SUM(Sheet1!D2,Sheet1!D11)")
+
+      assert status == :error
+      assert resp == "given invalid file id"
+    end
+  end
+
+  describe "set_cell_formula!/5" do
+    test "unmerges cells" do
+      {:ok, file_id} = Base.new_file()
+
+      resp = Cell.set_cell_formula!(file_id, "Sheet1", "A1", "SUM(Sheet1!D2,Sheet1!D11)")
+
+      assert resp == file_id
+
+      Base.close_file(file_id)
+    end
+
+    test "failed given invalid file_id" do
+      assert_raise Excelizer.Exception, "given invalid file id", fn ->
+        Cell.set_cell_formula!("invalid file id", "Sheet1", "A1", "SUM(Sheet1!D2,Sheet1!D11)")
+      end
+    end
+  end
+
+  describe "get_cell_formula/5" do
+    test "unmerge cells" do
+      {:ok, file_id} = Base.new_file()
+
+      {_, file_id} = Cell.set_cell_formula(file_id, "Sheet1", "A1", "SUM(Sheet1!D2,Sheet1!D11)")
+      {status, formula} = Cell.get_cell_formula(file_id, "Sheet1", "A1")
+
+      assert status == :ok
+      assert formula == "SUM(Sheet1!D2,Sheet1!D11)"
+
+      Base.close_file(file_id)
+    end
+
+    test "failed given invalid file_id" do
+      {status, formula} = Cell.get_cell_formula("invalid file id", "Sheet1", "A1")
+
+      assert status == :error
+      assert formula == "given invalid file id"
+    end
+  end
+
+  describe "get_cell_formula!/5" do
+    test "unmerges cells" do
+      {:ok, file_id} = Base.new_file()
+
+      _ = Cell.set_cell_formula!(file_id, "Sheet1", "A1", "SUM(Sheet1!D2,Sheet1!D11)")
+      formula = Cell.get_cell_formula!(file_id, "Sheet1", "A1")
+
+      assert formula == "SUM(Sheet1!D2,Sheet1!D11)"
+
+      Base.close_file(file_id)
+    end
+
+    test "failed given invalid file_id" do
+      assert_raise Excelizer.Exception, "given invalid file id", fn ->
+        Cell.get_cell_formula!("invalid file id", "Sheet1", "A1")
+      end
+    end
+  end
 end

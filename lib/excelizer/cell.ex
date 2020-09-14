@@ -70,6 +70,33 @@ defmodule Excelizer.Cell do
     end
   end
 
+  @spec set_cell_formula(Base.file_id(), String.t(), String.t(), String.t()) ::
+          Base.nif_resp(Base.file_id())
+  def set_cell_formula(file_id, sheet_name, axis, formula),
+    do: Base.set_cell_formula(file_id, sheet_name, axis, formula)
+
+  @spec set_cell_formula!(Base.file_id(), String.t(), String.t(), String.t()) ::
+          Base.file_id()
+  def set_cell_formula!(file_id, sheet_name, axis, formula) do
+    case Base.set_cell_formula(file_id, sheet_name, axis, formula) do
+      {:ok, file_id} -> file_id
+      {:error, err_msg} -> raise Excelizer.Exception, message: err_msg
+    end
+  end
+
+  @spec get_cell_formula(Base.file_id(), String.t(), String.t()) ::
+          Base.nif_resp(String.t())
+  def get_cell_formula(file_id, sheet_name, axis),
+    do: Base.get_cell_formula(file_id, sheet_name, axis)
+
+  @spec get_cell_formula!(Base.file_id(), String.t(), String.t()) :: String.t()
+  def get_cell_formula!(file_id, sheet_name, axis) do
+    case Base.get_cell_formula(file_id, sheet_name, axis) do
+      {:ok, formula} -> formula
+      {:error, err_msg} -> raise Excelizer.Exception, message: err_msg
+    end
+  end
+
   defp convert_according_to_value_type(value, value_type) when value_type in ["boolean", "nil"],
     do: to_string(value)
 
