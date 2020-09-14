@@ -12,7 +12,7 @@ defmodule Excelizer.MixProject do
       package: package(),
       compilers: [:elixir_make] ++ Mix.compilers(),
       docs: [
-        main: "Excelizer", # The main page in the docs
+        main: "Excelizer",
         extras: ["README.md"]
       ]
     ]
@@ -27,7 +27,12 @@ defmodule Excelizer.MixProject do
 
   defp package do
     [
-      files: ["lib", "LICENSE", "mix.exs", "README.md", "go_src/*.go", "Makefile"]
+      maintainers: ["Masashi Yokota"],
+      files: ["lib", "LICENSE", "mix.exs", "README.md", "go_src/*.go", "Makefile"],
+      licenses: ["MIT"],
+      links: %{
+        GitHub: "https://github.com/MasashiYokota/excelizer"
+      }
     ]
   end
 
