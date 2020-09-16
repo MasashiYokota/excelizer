@@ -11,9 +11,9 @@ else
 		CFLAGS += -fPIC
 
 		ifeq ($(shell uname),Darwin)
-			LDFLAGS += -dynamiclib -flat_namespace -undefined suppress
+			LDFLAGS += -flat_namespace -undefined suppress
 		else
-			LDFLAGS += -shared
+			LDFLAGS += -Wl,--unresolved-symbols=ignore-all
 		endif
 	endif
 endif
@@ -25,7 +25,7 @@ libgo_excelizer.h: excelizer.go
 	go tool cgo -exportheader libgo_excelizer.h excelizer.go
 
 excelizer_nif.so: excelizer.c libgo_excelizer.a libgo_excelizer.h
-	${CC} ${CFLAGS} -shared -L. ${LDFLAGS} -lgo_excelizer excelizer.c -o excelizer_nif.so
+	${CC} ${CFLAGS} -shared ${LDFLAGS} excelizer.c libgo_excelizer.a -o excelizer_nif.so
 
 clean:
 	rm -rf excelizer_nif.so libgo_excelizer.h libgo_excelizer.a
