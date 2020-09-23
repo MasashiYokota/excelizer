@@ -6,6 +6,7 @@ defmodule Excelizer.Image.Format do
             y_scale: nil,
             x_offset: nil,
             y_offset: nil,
+            autofit: false,
             print_obj: false,
             lock_aspect_ratio: false,
             locked: false,
@@ -18,6 +19,7 @@ defmodule Excelizer.Image.Format do
 
     * x_scale / y_scale: scale for x/y axis
     * x_offset / y_offset: offset for x/y axis
+    * autofit: auto-resize an image fit to the cell.
     * print_obj: printing an attached image
     * lock_aspect_ratio: if true, lock aspect ratio of an attached image
     * locked: if true, users can't modify an attached image,
@@ -35,6 +37,7 @@ defmodule Excelizer.Image.Format do
           y_scale: nil | number(),
           x_offset: nil | number(),
           y_offset: nil | number(),
+          autofit: boolean(),
           print_obj: boolean(),
           lock_aspect_ratio: boolean(),
           locked: boolean(),
@@ -55,6 +58,7 @@ defmodule Excelizer.Image.Format do
           "locked" => false,
           "positioning" => nil,
           "print_obj" => false,
+          "autofit" => false,
           "x_offset" => nil,
           "x_scale" => nil,
           "y_offset" => nil,
@@ -70,6 +74,7 @@ defmodule Excelizer.Image.Format do
           "locked" => false,
           "positioning" => "oneCell",
           "print_obj" => false,
+          "autofit" => false,
           "x_offset" => nil,
           "x_scale" => nil,
           "y_offset" => nil,
@@ -85,6 +90,7 @@ defmodule Excelizer.Image.Format do
           "locked" => false,
           "positioning" => "absolute",
           "print_obj" => false,
+          "autofit" => false,
           "x_offset" => nil,
           "x_scale" => nil,
           "y_offset" => nil,
