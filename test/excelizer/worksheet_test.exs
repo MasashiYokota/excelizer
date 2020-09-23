@@ -229,7 +229,7 @@ defmodule Excelizer.WorksheetTest do
     test "return {:ok, height} of given valid sheet_name and height", %{file_id: file_id} do
       {status, width} = Worksheet.get_row_height(file_id, "Sheet1", 1)
       assert status == :ok
-      assert width == 20.0
+      assert width == 15.0
     end
 
     test "return {:error, error_msg} of given invalid sheet_name and height", %{file_id: file_id} do
@@ -246,7 +246,7 @@ defmodule Excelizer.WorksheetTest do
   describe "get_row_height!/3" do
     test "return height of given valid sheet_name and height", %{file_id: file_id} do
       width = Worksheet.get_row_height!(file_id, "Sheet1", 1)
-      assert width == 20.0
+      assert width == 15.0
     end
 
     test "raise error when given invalid sheet_name and height", %{file_id: file_id} do
