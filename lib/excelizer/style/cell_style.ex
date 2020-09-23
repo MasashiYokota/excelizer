@@ -842,7 +842,7 @@ defmodule Excelizer.Style.CellStyle do
           "italic" => false,
           "size" => nil,
           "strike" => false,
-          "underline" => "single"
+          "underline" => nil
         },
         "lang" => nil,
         "negred" => false,

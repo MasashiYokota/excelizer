@@ -5,7 +5,7 @@ defmodule Excelizer.Style.Font do
 
   defstruct bold: false,
             italic: false,
-            underline: :single,
+            underline: nil,
             family: nil,
             size: nil,
             strike: false,
@@ -17,7 +17,7 @@ defmodule Excelizer.Style.Font do
   @type t :: %__MODULE__{
           bold: boolean(),
           italic: boolean(),
-          underline: underline(),
+          underline: nil | underline(),
           family: String.t() | nil,
           size: number() | nil,
           strike: boolean(),
