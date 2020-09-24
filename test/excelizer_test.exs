@@ -39,8 +39,6 @@ defmodule ExcelizerTest do
           Cell.set_cell_value!(file_id, "Sheet1", "A1", "datetime", ~D[2020-05-23])
           Cell.set_cell_value!(file_id, "Sheet1", "A1", "nil", nil)
           Cell.set_cell_value!(file_id, "Sheet1", "A1", "int", 1)
-
-          {:ok, file_id}
         end)
 
       assert status == :ok
@@ -50,7 +48,6 @@ defmodule ExcelizerTest do
       assert_raise Excelizer.Exception, "invalid filepath", fn ->
         Excelizer.open("tmp/hoge_test.xlsx", fn file_id ->
           Cell.set_cell_value!(file_id, "Sheet1", "A1", "string", "test")
-          {:ok, file_id}
         end)
       end
     end
@@ -60,8 +57,15 @@ defmodule ExcelizerTest do
     test "create a new excel file" do
       Excelizer.new("tmp/new_test.xlsx", fn file_id ->
         Cell.set_cell_value!(file_id, "Sheet1", "A1", "string", "test")
-        {:ok, file_id}
       end)
+    end
+
+    test "raise error when given function raises error" do
+      assert_raise Excelizer.Exception, fn ->
+        Excelizer.new("tmp/new_test.xlsx", fn _ ->
+          Cell.set_cell_value!("invalid file id", "Sheet1", "A1", "string", "test")
+        end)
+      end
     end
   end
 end

@@ -18,7 +18,7 @@ defmodule Excelizer do
     end
   end
 
-  @spec open(String.t(), function) :: :ok | :error
+  @spec open(String.t(), function) :: :ok
   def open(filename, func) do
     if File.exists?(filename) do
       do_open(filename, func)
@@ -28,23 +28,34 @@ defmodule Excelizer do
   end
 
   defp do_open(filename, func) do
-    with {:ok, file_id} <- Base.open_file(filename),
-         {:ok, file_id} <- func.(file_id),
-         {:ok, file_id} <- Base.save(file_id) do
+    file_id =
+      case Base.open_file(filename) do
+        {:ok, file_id} -> file_id
+        {:error, err_msg} -> raise Excelizer.Exception, message: err_msg
+      end
+
+    try do
+      func.(file_id)
+      :ok
+    after
       Base.close_file(file_id)
-    else
-      {:error, err_msg} -> raise Excelizer.Exception, message: err_msg
     end
   end
 
-  @spec new(String.t(), function) :: :ok | :error
+  @spec new(String.t(), function) :: :ok
   def new(filename, func) do
-    with {:ok, file_id} <- Base.new_file(),
-         {:ok, file_id} <- func.(file_id),
-         {:ok, file_id} <- Base.save_as(file_id, filename) do
+    file_id =
+      case Base.new_file() do
+        {:ok, file_id} -> file_id
+        {:error, err_msg} -> raise Excelizer.Exception, message: err_msg
+      end
+
+    try do
+      func.(file_id)
+      {:ok, _} = Base.save_as(file_id, filename)
+      :ok
+    after
       Base.close_file(file_id)
-    else
-      {:error, err_msg} -> raise Excelizer.Exception, message: err_msg
     end
   end
 end
