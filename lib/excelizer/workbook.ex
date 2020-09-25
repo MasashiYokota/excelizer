@@ -4,6 +4,31 @@ defmodule Excelizer.Workbook do
   """
   alias Excelizer.Native.Base
 
+  @undefined_filename_error "no path defined for file, consider File.WriteTo or File.Write"
+  @undefined_filename_error_message "Undefined Filename Error: please use save_as/1 instead of save/1"
+
+  @spec save(Base.file_id()) :: Base.file_id()
+  def save(file_id) do
+    case Base.save(file_id) do
+      {:ok, file_id} ->
+        file_id
+
+      {:error, @undefined_filename_error} ->
+        raise Excelizer.Exception, message: @undefined_filename_error_message
+
+      {:error, err_msg} ->
+        raise Excelizer.Exception, message: err_msg
+    end
+  end
+
+  @spec save_as(Base.file_id(), String.t()) :: Base.file_id()
+  def save_as(file_id, filename) do
+    case Base.save_as(file_id, filename) do
+      {:ok, file_id} -> file_id
+      {:error, err_msg} -> raise Excelizer.Exception, message: err_msg
+    end
+  end
+
   @spec new_sheet(Base.file_id(), String.t()) :: Base.nif_resp(pos_integer)
   def new_sheet(file_id, sheet_name), do: Base.new_sheet(file_id, sheet_name)
 

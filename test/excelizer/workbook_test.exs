@@ -13,6 +13,50 @@ defmodule Excelizer.WorkbookTest do
     [file_id: file_id]
   end
 
+  describe "save/1" do
+    test "save a file" do
+      {:ok, file_id} = Base.open_file("tmp/test.xlsx")
+
+      on_exit(fn ->
+        Base.close_file(file_id)
+      end)
+
+      resp = Workbook.save(file_id)
+      assert resp == file_id
+    end
+
+    test "failed to save a file", %{file_id: file_id} do
+      assert_raise Excelizer.Exception,
+                   "Undefined Filename Error: please use save_as/1 instead of save/1",
+                   fn ->
+                     Workbook.save(file_id)
+                   end
+
+      assert_raise Excelizer.Exception, "given invalid file id", fn ->
+        Workbook.save("invalid_file_id")
+      end
+    end
+  end
+
+  describe "save_as/2" do
+    @tmp_filename "test/assets/tmp.xlsx"
+    test "save a file with filename", %{file_id: file_id} do
+      resp = Workbook.save_as(file_id, @tmp_filename)
+
+      on_exit(fn ->
+        File.rm!(@tmp_filename)
+      end)
+
+      assert resp == file_id
+    end
+
+    test "failed to save a file" do
+      assert_raise Excelizer.Exception, "given invalid file id", fn ->
+        Workbook.save_as("invalid_file_id", @tmp_filename)
+      end
+    end
+  end
+
   describe "new_sheet/2" do
     test "create a new sheet", %{file_id: file_id} do
       {status, resp} = Workbook.new_sheet(file_id, "test")
