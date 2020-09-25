@@ -6,6 +6,10 @@ package main
 
 typedef const ERL_NIF_TERM nif_arg_t;
 
+#if defined(__clang__)
+
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wunused-function"
 static void update_binary(ErlNifBinary* bin, void* str, size_t size) {
 	memcpy(bin->data, str, size);
 }
@@ -13,6 +17,22 @@ static void update_binary(ErlNifBinary* bin, void* str, size_t size) {
 static ERL_NIF_TERM get_arg(ERL_NIF_TERM* arg, int index) {
 	return arg[index];
 }
+#pragma clang diagnostic pop
+
+#elif defined(__GNUC__)
+
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wunused-function"
+static void update_binary(ErlNifBinary* bin, void* str, size_t size) {
+	memcpy(bin->data, str, size);
+}
+
+static ERL_NIF_TERM get_arg(ERL_NIF_TERM* arg, int index) {
+	return arg[index];
+}
+#pragma GCC diagnostic pop
+
+#endif
 
 */
 import "C"
