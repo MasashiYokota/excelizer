@@ -10,7 +10,7 @@ ERL_NIF_TERM read_sheet(ErlNifEnv *env, int argc, const ERL_NIF_TERM argv[]) {
 }
 
 ERL_NIF_TERM open_file(ErlNifEnv *env, int argc, const ERL_NIF_TERM argv[]) {
-  return enif_schedule_nif(env, "OpenFile", ERL_NIF_DIRTY_JOB_IO_BOUND, OpenFile, argc, argv);
+  return OpenFile(env, argc, argv);
 }
 
 ERL_NIF_TERM new_file(ErlNifEnv *env, int argc, const ERL_NIF_TERM argv[]) {
@@ -18,11 +18,11 @@ ERL_NIF_TERM new_file(ErlNifEnv *env, int argc, const ERL_NIF_TERM argv[]) {
 }
 
 ERL_NIF_TERM save_as(ErlNifEnv *env, int argc, const ERL_NIF_TERM argv[]) {
-  return enif_schedule_nif(env, "SaveAs", ERL_NIF_DIRTY_JOB_IO_BOUND, SaveAs, argc, argv);
+  return SaveAs(env, argc, argv);
 }
 
 ERL_NIF_TERM save(ErlNifEnv *env, int argc, const ERL_NIF_TERM argv[]) {
-  return enif_schedule_nif(env, "Save", ERL_NIF_DIRTY_JOB_IO_BOUND, Save, argc, argv);
+  return Save(env, argc, argv);
 }
 
 ERL_NIF_TERM delete_sheet(ErlNifEnv *env, int argc, const ERL_NIF_TERM argv[]) {
@@ -158,12 +158,12 @@ ERL_NIF_TERM add_picture_from_bytes(ErlNifEnv *env, int argc, const ERL_NIF_TERM
 
 // --------------------------- StreamWrite ---------------------------
 ERL_NIF_TERM set_row(ErlNifEnv *env, int argc, const ERL_NIF_TERM argv[]) {
-  return enif_schedule_nif(env, "SetRow", ERL_NIF_DIRTY_JOB_CPU_BOUND, SetRow, argc, argv);
+  return SetRow(env, argc, argv);
 }
 
 static ErlNifFunc excelixir_nif_funcs[] = {
   {"read_sheet", 2, read_sheet},
-  {"open_file", 1, open_file},
+  {"open_file", 1, open_file, ERL_NIF_DIRTY_JOB_IO_BOUND},
   {"new_file", 0, new_file},
   {"new_sheet", 2, new_sheet},
   {"set_col_visible", 4, set_col_visible},
@@ -182,8 +182,8 @@ static ErlNifFunc excelixir_nif_funcs[] = {
   {"insert_row", 3, insert_row},
   {"remove_col", 3, remove_col},
   {"remove_row", 3, remove_row},
-  {"save_as", 2, save_as},
-  {"save", 1, save},
+  {"save_as", 2, save_as, ERL_NIF_DIRTY_JOB_IO_BOUND},
+  {"save", 1, save, ERL_NIF_DIRTY_JOB_IO_BOUND},
   {"delete_sheet", 2, delete_sheet},
   {"copy_sheet", 3, copy_sheet},
   {"set_sheet_background", 3, set_sheet_background},
@@ -199,7 +199,7 @@ static ErlNifFunc excelixir_nif_funcs[] = {
   {"get_cell_formula", 3, get_cell_formula},
   {"add_picture", 5, add_picture},
   {"add_picture_from_bytes", 7, add_picture_from_bytes},
-  {"set_row", 4, set_row},
+  {"set_row", 4, set_row, ERL_NIF_DIRTY_JOB_CPU_BOUND},
 };
 
 ERL_NIF_INIT(Elixir.Excelizer.Native.Base, excelixir_nif_funcs, NULL, NULL, NULL, NULL)
